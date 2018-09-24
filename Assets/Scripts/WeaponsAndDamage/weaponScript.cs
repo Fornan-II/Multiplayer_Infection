@@ -12,7 +12,9 @@ public class weaponScript : MonoBehaviour {
     public int damage = 30;
     public int range = 100;
 
-    private void Update()
+    protected bool _canFireNextShot = true;
+
+    protected virtual void Update()
     {
         if(Input.GetButton("Fire1"))
         {
@@ -20,8 +22,10 @@ public class weaponScript : MonoBehaviour {
         }
     }
 
-    public void FireShot()
+    public virtual void FireShot()
     {
+        if(!_canFireNextShot) { return; }
+
         RaycastHit hit;
         Ray ray = ownersCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
 
@@ -51,5 +55,10 @@ public class weaponScript : MonoBehaviour {
                 Debug.Log("Hit!");
             }
         }
+    }
+
+    public virtual void ResetCanFireShot()
+    {
+        _canFireNextShot = true;
     }
 }

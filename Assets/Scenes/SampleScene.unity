@@ -952,6 +952,7 @@ MonoBehaviour:
   zombiePrefab: {fileID: 1284238258153438, guid: 22fab34c61c730d4a9a75f6baefb56c2,
     type: 2}
   spawnPos: {fileID: 1474304267}
+  controlledObject: {fileID: 0}
   myPlayerType: 0
   isConnected: 0
 --- !u!4 &1474304267
