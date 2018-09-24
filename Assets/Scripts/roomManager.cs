@@ -7,8 +7,19 @@ public class roomManager : MonoBehaviourPunCallbacks {
 
     public string roomName = "defaultRoom";
 
-    public GameObject playerPrefab;
+    public GameObject humanPrefab;
+    public GameObject zombiePrefab;
     public Transform spawnPos;
+
+    public GameObject controlledObject = null;
+
+    public enum PlayerType
+    {
+        SPECTATOR,
+        HUMAN,
+        ZOMBIE
+    }
+    public PlayerType myPlayerType = PlayerType.SPECTATOR;
 
     public bool isConnected = false;
 
@@ -28,15 +39,27 @@ public class roomManager : MonoBehaviourPunCallbacks {
     {
         Debug.Log("Room joined");
         isConnected = true;
-        SpawnPlayer();
+        StartCoroutine(WaitForTeamSelection());
     }
 
     public void SpawnPlayer()
     {
-        GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawnPos.position, spawnPos.rotation) as GameObject;
+        if(myPlayerType == PlayerType.SPECTATOR || controlledObject) { return; }
+
+        string prefabName = "";
+        if (myPlayerType == PlayerType.HUMAN) { prefabName = humanPrefab.name; }
+        else if (myPlayerType == PlayerType.ZOMBIE) { prefabName = zombiePrefab.name; }
+
+        GameObject player = PhotonNetwork.Instantiate(prefabName, spawnPos.position, spawnPos.rotation) as GameObject;
 
         DamageReciever dr = player.GetComponent<DamageReciever>();
-        if(dr) { dr.enabled = true; }
+        if(dr)
+        {
+            dr.enabled = true;
+            dr.myManager = this;
+        }
+        TeamBehavior tb = player.GetComponent<TeamBehavior>();
+        if(tb) { tb.myManager = this; }
         moveScript ms = player.GetComponent<moveScript>();
         if(ms)
         {
@@ -58,5 +81,17 @@ public class roomManager : MonoBehaviourPunCallbacks {
                 if (ls) { ls.enabled = true; }
             }
         }
+
+        controlledObject = player;
+    }
+
+    protected IEnumerator WaitForTeamSelection()
+    {
+        while(myPlayerType == PlayerType.SPECTATOR)
+        {
+            yield return null;
+        }
+
+        SpawnPlayer();
     }
 }

@@ -13,7 +13,7 @@ Prefab:
   m_IsPrefabAsset: 1
 --- !u!1 &1050690788766526
 GameObject:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 6
@@ -45,8 +45,9 @@ GameObject:
   - component: {fileID: 114306992884863694}
   - component: {fileID: 114603721776678552}
   - component: {fileID: 114463376470053964}
+  - component: {fileID: 114242804428146584}
   m_Layer: 8
-  m_Name: playerB
+  m_Name: playerZombie
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -96,10 +97,10 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1050690788766526}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.06999992, z: 0.79}
-  m_LocalScale: {x: 1, y: 1, z: 1.1962}
+  m_LocalPosition: {x: 0, y: 0.56999993, z: 0.54176503}
+  m_LocalScale: {x: 1, y: 0.33497, z: 0.4348546}
   m_Children: []
-  m_Father: {fileID: 4505195878942832}
+  m_Father: {fileID: 4170039831848194}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4170039831848194
@@ -112,6 +113,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 4091378518449786}
   - {fileID: 4505195878942832}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -127,7 +129,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4505195878942832}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: -90.870995, y: 0, z: 0}
 --- !u!4 &4505195878942832
 Transform:
@@ -139,10 +141,9 @@ Transform:
   m_LocalPosition: {x: 0, y: 0.5934478, z: 0.25457633}
   m_LocalScale: {x: 1, y: 0.33497, z: 0.36353}
   m_Children:
-  - {fileID: 4091378518449786}
   - {fileID: 4381104884818552}
   m_Father: {fileID: 4170039831848194}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &20312307562329466
 Camera:
@@ -199,7 +200,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: d0af9e00020a27f48a1fe2619038722c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -352,6 +353,19 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &114242804428146584
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1284238258153438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c7f3af1c63836e41aeae350d14468fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myManager: {fileID: 0}
+  AllowsFriendlyFire: 1
 --- !u!114 &114306992884863694
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -427,6 +441,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 100
+  myTeam: {fileID: 114242804428146584}
 --- !u!114 &114701540919180638
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -447,7 +462,7 @@ MonoBehaviour:
   - {fileID: 114737030918208708}
   - {fileID: 114306992884863694}
   viewIdField: 0
-  InstantiationId: -1
+  InstantiationId: 1
   isRuntimeInstantiated: 0
 --- !u!114 &114737030918208708
 MonoBehaviour:
@@ -475,6 +490,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ownersCamera: {fileID: 20312307562329466}
+  ownersTeam: {fileID: 114242804428146584}
   hitParticle: {fileID: 1800437452848824, guid: e43a8bd1cba21a54dbdb946b05efc854,
     type: 2}
   damage: 30

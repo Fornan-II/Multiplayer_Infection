@@ -7,6 +7,7 @@ using Photon.Realtime;
 public class weaponScript : MonoBehaviour {
 
     public Camera ownersCamera;
+    public TeamBehavior ownersTeam;
     public GameObject hitParticle;
     public int damage = 30;
     public int range = 100;
@@ -28,7 +29,22 @@ public class weaponScript : MonoBehaviour {
         {
             GameObject par = PhotonNetwork.Instantiate(hitParticle.name, hit.point, hit.transform.rotation);
             PhotonView pv = hit.transform.GetComponent<PhotonView>();
-            if (pv)
+            //Check for friendly fire
+            bool letDamage = true;
+            TeamBehavior tb = hit.transform.GetComponent<TeamBehavior>();
+            if(tb)
+            {
+                if(!tb.AllowsFriendlyFire)
+                {
+                    System.Type ownerType = ownersTeam.GetType();
+                    System.Type hitType = tb.GetType();
+                    if(ownerType == hitType)
+                    {
+                        letDamage = false;
+                    }
+                }
+            }
+            if (pv && letDamage)
             {
                 //RPCs are basically calling a method over the network,
                 pv.RPC("ApplyDamage", RpcTarget.All, damage);

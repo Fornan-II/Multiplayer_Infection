@@ -6,6 +6,9 @@ using Photon.Pun;
 public class DamageReciever : MonoBehaviour {
 
     public int health = 100;
+    public TeamBehavior myTeam;
+    public roomManager myManager;
+    protected bool _isDying = false;
 
     private void FixedUpdate()
     {
@@ -29,31 +32,13 @@ public class DamageReciever : MonoBehaviour {
     {
         health -= dmg;
         Debug.Log("ouchie");
-        if(health <= 0.0f)
+        if(health <= 0.0f && !_isDying)
         {
-            PhotonView pv = gameObject.GetComponent<PhotonView>();
-            if (pv)
-            {
-                pv.RPC("Die", RpcTarget.AllBuffered);
-                if(pv.IsMine)
-                {
-                    roomManager rm = GameObject.FindGameObjectWithTag("Room").GetComponent<roomManager>();
-                    if (rm)
-                    {
-                        rm.SpawnPlayer();
-                    }
-                }
-            }
+            _isDying = true;
+            myTeam.OnDie();
+            PhotonNetwork.Destroy(gameObject);
+            myManager.controlledObject = null;
+            myManager.SpawnPlayer();
         }
-    }
-
-    [PunRPC]
-    public void Die()
-    {
-        Destroy(gameObject);
-
-        
-        //PhotonNetwork.Disconnect();
-        //UnityEngine.SceneManagement.SceneManager.LoadScene(0);
     }
 }
