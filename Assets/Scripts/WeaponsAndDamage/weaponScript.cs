@@ -16,6 +16,7 @@ public class weaponScript : MonoBehaviour {
 
     protected virtual void Update()
     {
+        //Do this better - currently every weapon on a client attacks at once -.-
         if(Input.GetButton("Fire1"))
         {
             FireShot();
@@ -31,14 +32,14 @@ public class weaponScript : MonoBehaviour {
 
         if(Physics.Raycast(ray, out hit, range))
         {
-            GameObject par = PhotonNetwork.Instantiate(hitParticle.name, hit.point, hit.transform.rotation);
+            /*GameObject par = */PhotonNetwork.Instantiate(hitParticle.name, hit.point, hit.transform.rotation);
             PhotonView pv = hit.transform.GetComponent<PhotonView>();
             //Check for friendly fire
             bool letDamage = true;
             TeamBehavior tb = hit.transform.GetComponent<TeamBehavior>();
             if(tb)
             {
-                if(!tb.AllowsFriendlyFire)
+                if(!ownersTeam.AllowsFriendlyFire)
                 {
                     System.Type ownerType = ownersTeam.GetType();
                     System.Type hitType = tb.GetType();

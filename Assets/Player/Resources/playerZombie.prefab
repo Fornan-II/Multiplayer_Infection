@@ -38,7 +38,7 @@ GameObject:
   - component: {fileID: 4798523298854954}
   - component: {fileID: 33572261293301282}
   - component: {fileID: 23524842184069926}
-  - component: {fileID: 114681180763716430}
+  - component: {fileID: 114747567328802214}
   m_Layer: 0
   m_Name: Machete
   m_TagString: Untagged
@@ -401,6 +401,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 865b89dddc57fe94c949795cbf2318f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _smoothMouse: {x: 0, y: 0}
   clampInDegrees: {x: 360, y: 180}
   lockCursor: 1
   sensitivity: {x: 2, y: 2}
@@ -422,23 +423,6 @@ MonoBehaviour:
   health: 100
   myTeam: {fileID: 114242804428146584}
   myManager: {fileID: 0}
---- !u!114 &114681180763716430
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1099078738165012}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa9ae37d88ae38c428b40a0fa50737a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ownersCamera: {fileID: 20312307562329466}
-  ownersTeam: {fileID: 114242804428146584}
-  hitParticle: {fileID: 1800437452848824, guid: e43a8bd1cba21a54dbdb946b05efc854,
-    type: 2}
-  damage: 10
-  range: 100
 --- !u!114 &114701540919180638
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -475,6 +459,27 @@ MonoBehaviour:
   m_SynchronizePosition: 1
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 1
+--- !u!114 &114747567328802214
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1099078738165012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3966852cf20929149ba6e4abce9e25aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownersCamera: {fileID: 20312307562329466}
+  ownersTeam: {fileID: 114242804428146584}
+  hitParticle: {fileID: 1800437452848824, guid: e43a8bd1cba21a54dbdb946b05efc854,
+    type: 2}
+  damage: 0
+  range: 10
+  LungeForce: 3
+  LungeTimeOut: 1
+  damageSphereRadius: 0.5
+  damageSphereOffset: 1
 --- !u!136 &136575353732643828
 CapsuleCollider:
   m_ObjectHideFlags: 1
