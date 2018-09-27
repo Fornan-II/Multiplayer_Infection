@@ -6,14 +6,16 @@ using Photon.Pun;
 public class SwordScript : weaponScript {
 
     public float LungeForce = 3.0f;
-    public float LungeTimeOut = 1.0f;
     public float damageSphereRadius = 0.5f;
     public float damageSphereOffset = 1.0f;
 
     protected PhotonView _target;
-    protected float _lungeTimer = 0.0f;
     protected lookScript _playerLookScript;
     protected Rigidbody _playerBody;
+    protected advancedMoveScript _playerMovement;
+    protected Vector3 _lungeVector = Vector3.zero;
+    protected Vector3 _lungeStartingPosition;
+    protected float _maxLungeDistance;
 
     private void Start()
     {
@@ -25,31 +27,24 @@ public class SwordScript : weaponScript {
                 if(_playerLookScript.characterBody)
                 {
                     _playerBody = _playerLookScript.characterBody.GetComponent<Rigidbody>();
+                    _playerMovement = _playerLookScript.characterBody.GetComponent<advancedMoveScript>();
                 }
             }
         }
     }
 
     protected virtual void FixedUpdate()
-    {
-        if(_lungeTimer > 0.0f)
+    {//If we can't fire next shot, then we can assume we are currently attacking.
+        if(!_canFireNextShot)
         {
-            _lungeTimer -= Time.fixedDeltaTime;
-            if(_lungeTimer <= 0.0f)
+            if (Vector3.Distance(transform.position, _lungeStartingPosition) >= _maxLungeDistance)
             {
                 ResetCanFireShot();
             }
-        }
 
-        //If we can't fire next shot, then we can assume we are currently attacking.
-        if(!_canFireNextShot)
-        {
             if(_playerBody && _playerLookScript && _target)
             {
-                Vector3 targetDir = _target.transform.position - ownersCamera.transform.position;
-                _playerBody.AddForce(ownersCamera.transform.forward * LungeForce, ForceMode.VelocityChange);
-                //float angle = Vector3.Angle(ownersCamera.transform.forward, targetDir);
-                //_playerLookScript.smoothMouse = targetDir;
+                _playerBody.AddForce(_lungeVector, ForceMode.VelocityChange);
             }
 
             Vector3 OverlapSpherePos = ownersCamera.transform.position + (ownersCamera.transform.forward * damageSphereOffset);
@@ -94,7 +89,11 @@ public class SwordScript : weaponScript {
         if(_target)
         {
             _canFireNextShot = false;
-            _lungeTimer = LungeTimeOut;
+            _lungeStartingPosition = transform.position;
+            Vector2 targetDirection = _target.transform.position - ownersCamera.transform.position;
+            _maxLungeDistance = targetDirection.magnitude;
+            _lungeVector = targetDirection.normalized * LungeForce;
+            _playerMovement.letBeGrounded = false;
         }
     }
 
@@ -102,7 +101,9 @@ public class SwordScript : weaponScript {
     {
         base.ResetCanFireShot();
         _target = null;
-        _lungeTimer = 0.0f;
+        _lungeVector = Vector3.zero;
+        _playerMovement.letBeGrounded = true;
+        //_playerBody.velocity = Vector3.zero;
         //End attack anim
     }
 }

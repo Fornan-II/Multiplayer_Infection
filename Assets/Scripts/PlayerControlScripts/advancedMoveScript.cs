@@ -24,6 +24,8 @@ public class advancedMoveScript : MonoBehaviour
     public float maxGroundAngle = 45;
     public float coyoteTimeDuration = 0.1f;
     public float gravity = 20.0f;
+    [HideInInspector]
+    public bool letBeGrounded = true;
 
     //Audio sources
     public AudioSource feetAudio;
@@ -248,6 +250,12 @@ public class advancedMoveScript : MonoBehaviour
         //If the player's feet are touching something, player is grounded
         RaycastHit hitInfo;
         _shouldBeGrounded = Physics.SphereCast(checkPos, _col.radius, Vector3.down, out hitInfo, _col.height / 2, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+
+        if (!letBeGrounded)
+        {
+            _shouldBeGrounded = false;
+        }
+
         if (_shouldBeGrounded)
         {
             //Debug.DrawRay(hitInfo.point, hitInfo.normal, Color.yellow, 1.0f);
