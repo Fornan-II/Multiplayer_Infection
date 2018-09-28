@@ -10,18 +10,6 @@ public class DamageReciever : MonoBehaviour {
     public roomManager myManager;
     protected bool _isDying = false;
 
-    private void FixedUpdate()
-    {
-        /*if(health <= 0.0f)
-        {
-            PhotonView pv = gameObject.GetComponent<PhotonView>();
-            if(pv)
-            {
-                pv.RPC("Die", RpcTarget.AllBuffered);
-            }
-        }*/
-    }
-
     private void OnGUI()
     {
         GUI.Box(new Rect(10, 10, 100, 30), "HP : " + health);
@@ -37,7 +25,7 @@ public class DamageReciever : MonoBehaviour {
             _isDying = true;
             myTeam.OnDie();
             PhotonNetwork.Destroy(gameObject);
-            myManager.controlledObject = null;
+            myManager.playerController.TakeControlOf(null);
             myManager.SpawnPlayer();
         }
     }

@@ -46,6 +46,8 @@ GameObject:
   - component: {fileID: 114603721776678552}
   - component: {fileID: 114463376470053964}
   - component: {fileID: 114167211767056408}
+  - component: {fileID: 114534966483246212}
+  - component: {fileID: 114654720767678556}
   m_Layer: 8
   m_Name: playerHuman
   m_TagString: Untagged
@@ -378,7 +380,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SynchronizeVelocity: 1
-  m_SynchronizeAngularVelocity: 0
+  m_SynchronizeAngularVelocity: 1
   m_TeleportEnabled: 0
   m_TeleportIfDistanceGreaterThan: 3
 --- !u!114 &114463376470053964
@@ -398,7 +400,7 @@ MonoBehaviour:
   allowCrouching: 1
   moveSpeed: 8
   groundedInertia: 0.7
-  aerialInertia: 0.975
+  aerialInertia: 0.95
   sprintMultiplier: 2
   crouchMultiplier: 0.5
   crouchRate: 5
@@ -406,6 +408,7 @@ MonoBehaviour:
   maxGroundAngle: 40
   coyoteTimeDuration: 0.1
   gravity: 20
+  letBeGrounded: 1
   feetAudio: {fileID: 0}
   footstepSound: []
   minFootstepVelocity: 9
@@ -422,6 +425,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 865b89dddc57fe94c949795cbf2318f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MouseInput: {x: 0, y: 0}
   clampInDegrees: {x: 360, y: 180}
   lockCursor: 1
   sensitivity: {x: 2, y: 2}
@@ -429,6 +433,21 @@ MonoBehaviour:
   targetDirection: {x: 0, y: 0}
   targetCharacterDirection: {x: 0, y: 0}
   characterBody: {fileID: 1284238258153438}
+  lockState: 1
+--- !u!114 &114534966483246212
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1284238258153438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af908abdd318b3145b0a5ecbeaa50973, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myMoveScript: {fileID: 114463376470053964}
+  myLookScript: {fileID: 114503641715294250}
+  myWeaponHolder: {fileID: 114654720767678556}
 --- !u!114 &114603721776678552
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -442,6 +461,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 100
   myTeam: {fileID: 114167211767056408}
+  myManager: {fileID: 0}
+--- !u!114 &114654720767678556
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1284238258153438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8509fea5126988489c6e48636677f47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myWeapon: {fileID: 114795299407883238}
+  hand: {fileID: 0}
 --- !u!114 &114701540919180638
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -462,7 +495,7 @@ MonoBehaviour:
   - {fileID: 114737030918208708}
   - {fileID: 114306992884863694}
   viewIdField: 0
-  InstantiationId: 1
+  InstantiationId: -1
   isRuntimeInstantiated: 0
 --- !u!114 &114737030918208708
 MonoBehaviour:

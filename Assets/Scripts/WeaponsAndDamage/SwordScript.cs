@@ -90,7 +90,7 @@ public class SwordScript : weaponScript {
         {
             _canFireNextShot = false;
             _lungeStartingPosition = transform.position;
-            Vector2 targetDirection = _target.transform.position - ownersCamera.transform.position;
+            Vector3 targetDirection = _target.transform.position - ownersCamera.transform.position;
             _maxLungeDistance = targetDirection.magnitude;
             _lungeVector = targetDirection.normalized * LungeForce;
             _playerMovement.letBeGrounded = false;

@@ -3,9 +3,11 @@
 [AddComponentMenu("Camera/Simple Smooth Mouse Look ")]
 public class lookScript : MonoBehaviour
 {
-    protected Vector2 _mouseAbsolute;
     [HideInInspector]
-    public Vector2 smoothMouse;
+    public Vector2 MouseInput;
+
+    protected Vector2 _mouseAbsolute;
+    protected Vector2 smoothMouse;
 
     public Vector2 clampInDegrees = new Vector2(360, 180);
     public bool lockCursor;
@@ -18,7 +20,7 @@ public class lookScript : MonoBehaviour
     // Yaw rotation will affect this object instead of the camera if set.
     public GameObject characterBody;
 
-    protected bool _lockState = true;
+    public bool lockState = true;
 
     void Start()
     {
@@ -35,15 +37,7 @@ public class lookScript : MonoBehaviour
         // Ensure the cursor is always locked when set
         if (lockCursor)
         {
-            if (Input.GetButtonDown("Fire1"))
-            {
-                _lockState = true;
-            }
-            if(Input.GetButtonDown("Cancel"))
-            {
-                _lockState = false;
-            }
-            if(_lockState)
+            if(lockState)
             {
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
@@ -55,14 +49,15 @@ public class lookScript : MonoBehaviour
             }
         }
 
-        if(!_lockState) { return; }
+        if(!lockState) { return; }
 
         // Allow the script to clamp based on a desired target value.
         var targetOrientation = Quaternion.Euler(targetDirection);
         var targetCharacterOrientation = Quaternion.Euler(targetCharacterDirection);
 
         // Get raw mouse input for a cleaner reading on more sensitive mice.
-        var mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+        //var mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+        Vector2 mouseDelta = MouseInput;
 
         // Scale input against the sensitivity setting and multiply that against the smoothing value.
         mouseDelta = Vector2.Scale(mouseDelta, new Vector2(sensitivity.x * smoothing.x, sensitivity.y * smoothing.y));

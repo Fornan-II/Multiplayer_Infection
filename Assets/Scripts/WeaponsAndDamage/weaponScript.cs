@@ -14,15 +14,6 @@ public class weaponScript : MonoBehaviour {
 
     protected bool _canFireNextShot = true;
 
-    protected virtual void Update()
-    {
-        //Do this better - currently every weapon on a client attacks at once -.-
-        if(Input.GetButton("Fire1"))
-        {
-            FireShot();
-        }
-    }
-
     public virtual void FireShot()
     {
         if(!_canFireNextShot) { return; }

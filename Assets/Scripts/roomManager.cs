@@ -11,7 +11,7 @@ public class roomManager : MonoBehaviourPunCallbacks {
     public GameObject zombiePrefab;
     public Transform spawnPos;
 
-    public GameObject controlledObject = null;
+    public PlayerController playerController;
 
     public enum PlayerType
     {
@@ -44,7 +44,7 @@ public class roomManager : MonoBehaviourPunCallbacks {
 
     public void SpawnPlayer()
     {
-        if(myPlayerType == PlayerType.SPECTATOR || controlledObject) { return; }
+        if(myPlayerType == PlayerType.SPECTATOR) { return; }
 
         string prefabName = "";
         if (myPlayerType == PlayerType.HUMAN) { prefabName = humanPrefab.name; }
@@ -82,7 +82,9 @@ public class roomManager : MonoBehaviourPunCallbacks {
             }
         }
 
-        controlledObject = player;
+        //No idea if this'll work or cause more sync errors
+        Pawn p = player.GetComponent<Pawn>();
+        playerController.TakeControlOf(p);
     }
 
     protected IEnumerator WaitForTeamSelection()

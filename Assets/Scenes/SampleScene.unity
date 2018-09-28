@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -928,6 +928,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1474304267}
   - component: {fileID: 1474304266}
+  - component: {fileID: 1474304268}
   m_Layer: 0
   m_Name: RoomManager
   m_TagString: Room
@@ -952,7 +953,7 @@ MonoBehaviour:
   zombiePrefab: {fileID: 1284238258153438, guid: 22fab34c61c730d4a9a75f6baefb56c2,
     type: 2}
   spawnPos: {fileID: 1474304267}
-  controlledObject: {fileID: 0}
+  playerController: {fileID: 1474304268}
   myPlayerType: 0
   isConnected: 0
 --- !u!4 &1474304267
@@ -968,6 +969,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1474304268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1474304265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa3c0a792cd1f5d4c98092b2d5eaee8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1529131129
 GameObject:
   m_ObjectHideFlags: 0
