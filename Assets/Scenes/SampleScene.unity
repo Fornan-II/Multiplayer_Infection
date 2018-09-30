@@ -1177,6 +1177,8 @@ GameObject:
   - component: {fileID: 1474304267}
   - component: {fileID: 1474304266}
   - component: {fileID: 1474304268}
+  - component: {fileID: 1474304270}
+  - component: {fileID: 1474304269}
   m_Layer: 0
   m_Name: RoomManager
   m_TagString: Room
@@ -1227,6 +1229,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa3c0a792cd1f5d4c98092b2d5eaee8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1474304269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1474304265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2554093337c79da41bad40dcbd7fad17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!65 &1474304270
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1474304265}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 200, y: 200, z: 200}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1529131129
 GameObject:
   m_ObjectHideFlags: 0
