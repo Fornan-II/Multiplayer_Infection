@@ -55,7 +55,6 @@ public class SwordScript : weaponScript {
                 if(pv == _target)
                 {
                     pv.RPC("ApplyDamage", RpcTarget.All, damage);
-                    Debug.Log("Hit!");
                     ResetCanFireShot();
                 }
             }

@@ -49,7 +49,7 @@ public class roomManager : MonoBehaviourPunCallbacks {
         if (myPlayerType == PlayerType.HUMAN) { prefabName = humanPrefab.name; }
         else if (myPlayerType == PlayerType.ZOMBIE) { prefabName = zombiePrefab.name; }
         
-        GameObject player = SpawnPoint.SpawnPlayerAtRandomPoint(prefabName);
+        GameObject player = SpawnPoint.SpawnPlayerAtRandomPoint(prefabName, myPlayerType == PlayerType.ZOMBIE);
 
         DamageReciever dr = player.GetComponent<DamageReciever>();
         if(dr)
