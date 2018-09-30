@@ -11,6 +11,8 @@ public class weaponScript : MonoBehaviour {
     public GameObject hitParticle;
     public int damage = 30;
     public int range = 100;
+    public Rigidbody rb;
+    public Collider col;
 
     protected bool _canFireNextShot = true;
 

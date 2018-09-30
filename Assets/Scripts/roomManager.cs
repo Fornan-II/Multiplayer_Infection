@@ -9,7 +9,6 @@ public class roomManager : MonoBehaviourPunCallbacks {
 
     public GameObject humanPrefab;
     public GameObject zombiePrefab;
-    public Transform spawnPos;
 
     public PlayerController playerController;
 
@@ -49,8 +48,8 @@ public class roomManager : MonoBehaviourPunCallbacks {
         string prefabName = "";
         if (myPlayerType == PlayerType.HUMAN) { prefabName = humanPrefab.name; }
         else if (myPlayerType == PlayerType.ZOMBIE) { prefabName = zombiePrefab.name; }
-
-        GameObject player = PhotonNetwork.Instantiate(prefabName, spawnPos.position, spawnPos.rotation) as GameObject;
+        
+        GameObject player = SpawnPoint.SpawnPlayerAtRandomPoint(prefabName);
 
         DamageReciever dr = player.GetComponent<DamageReciever>();
         if(dr)

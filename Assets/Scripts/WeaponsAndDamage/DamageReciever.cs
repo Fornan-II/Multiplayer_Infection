@@ -19,14 +19,16 @@ public class DamageReciever : MonoBehaviour {
     public void ApplyDamage(int dmg)
     {
         health -= dmg;
-        Debug.Log("ouchie");
         if(health <= 0.0f && !_isDying)
         {
             _isDying = true;
             myTeam.OnDie();
             PhotonNetwork.Destroy(gameObject);
-            myManager.playerController.TakeControlOf(null);
-            myManager.SpawnPlayer();
+            if (myManager)
+            {
+                myManager.playerController.TakeControlOf(null);
+                myManager.SpawnPlayer();
+            }
         }
     }
 }

@@ -73,6 +73,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1388188185045624
+GameObject:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4443655080680580}
+  m_Layer: 8
+  m_Name: Hand
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1755580831815506
 GameObject:
   m_ObjectHideFlags: 0
@@ -119,6 +134,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4443655080680580
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1388188185045624}
+  m_LocalRotation: {x: -0.6121848, y: 0.021813344, z: -0.016898552, w: 0.7902332}
+  m_LocalPosition: {x: 0.394, y: 0.101, z: 2.12}
+  m_LocalScale: {x: 0.01, y: 0.029853422, z: 0.027508046}
+  m_Children:
+  - {fileID: 4798523298854954}
+  m_Father: {fileID: 4505195878942832}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: -75.19501, y: 12.467001, z: -12.066001}
 --- !u!4 &4505195878942832
 Transform:
   m_ObjectHideFlags: 1
@@ -129,7 +158,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0.5934478, z: 0.25457633}
   m_LocalScale: {x: 1, y: 0.33497, z: 0.36353}
   m_Children:
-  - {fileID: 4798523298854954}
+  - {fileID: 4443655080680580}
   m_Father: {fileID: 4170039831848194}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -139,11 +168,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1099078738165012}
-  m_LocalRotation: {x: -0.6121848, y: 0.021813344, z: -0.016898552, w: 0.7902332}
-  m_LocalPosition: {x: 0.394, y: 0.101, z: 2.12}
-  m_LocalScale: {x: 0.01, y: 0.029853422, z: 0.027508046}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 4505195878942832}
+  m_Father: {fileID: 4443655080680580}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: -75.19501, y: 12.467001, z: -12.066001}
 --- !u!20 &20312307562329466
@@ -461,7 +490,7 @@ MonoBehaviour:
   - {fileID: 114737030918208708}
   - {fileID: 114306992884863694}
   viewIdField: 0
-  InstantiationId: 1
+  InstantiationId: 2
   isRuntimeInstantiated: 0
 --- !u!114 &114719022726884804
 MonoBehaviour:
@@ -474,8 +503,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8509fea5126988489c6e48636677f47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myWeapon: {fileID: 114747567328802214}
-  hand: {fileID: 0}
+  equippedWeapon: {fileID: 114747567328802214}
+  letEquipWeapons: 0
+  hand: {fileID: 4443655080680580}
 --- !u!114 &114737030918208708
 MonoBehaviour:
   m_ObjectHideFlags: 1
