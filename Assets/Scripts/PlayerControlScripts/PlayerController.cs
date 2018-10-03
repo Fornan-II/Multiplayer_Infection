@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
+    public PlayerHUD playerHUD;
     public Pawn ControlledPawn { get { return _controlledPawn; } }
     protected Pawn _controlledPawn;
 
@@ -24,6 +25,9 @@ public class PlayerController : MonoBehaviour {
 
         _controlledPawn = pawn;
         _controlledPawn.OnTakeControl();
+
+        playerHUD.IsVisible(true);
+
         return true;
     }
 
@@ -31,11 +35,19 @@ public class PlayerController : MonoBehaviour {
     {
         _controlledPawn.OnReleasedControl();
         _controlledPawn = null;
+
+        playerHUD.IsVisible(false);
     }
 
     protected void Update()
     {
         HandleInput();
+
+        if(_controlledPawn)
+        {
+            playerHUD.SetMaxHealth(_controlledPawn.MaxHealth);
+            playerHUD.UpdateHealthUI(_controlledPawn.Health);
+        }
     }
 
     protected virtual void HandleInput()

@@ -10,9 +10,17 @@ public class DamageReciever : MonoBehaviour {
     public roomManager myManager;
     protected bool _isDying = false;
 
+    public int maxHealth { get { return _maxHealth; } }
+    protected int _maxHealth;
+
+    private void Start()
+    {
+        _maxHealth = health;
+    }
+
     private void OnGUI()
     {
-        GUI.Box(new Rect(10, 10, 100, 30), "HP : " + health);
+        //GUI.Box(new Rect(10, 10, 100, 30), "HP : " + health);
     }
 
     [PunRPC]

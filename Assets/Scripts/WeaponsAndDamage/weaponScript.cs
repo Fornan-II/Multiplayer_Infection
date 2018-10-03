@@ -13,8 +13,10 @@ public class weaponScript : MonoBehaviour {
     public int range = 100;
     public Rigidbody rb;
     public Collider col;
+    public Animator myAnimator;
 
-    protected bool _canFireNextShot = true;
+    [SerializeField]
+    protected bool _canFireNextShot = false;
 
     public virtual void FireShot()
     {
@@ -22,6 +24,8 @@ public class weaponScript : MonoBehaviour {
 
         RaycastHit hit;
         Ray ray = ownersCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
+        myAnimator.SetTrigger("Attack");
+        _canFireNextShot = false;
 
         if(Physics.Raycast(ray, out hit, range))
         {

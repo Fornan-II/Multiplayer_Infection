@@ -477,6 +477,7 @@ MonoBehaviour:
   myMoveScript: {fileID: 114463376470053964}
   myLookScript: {fileID: 114503641715294250}
   myWeaponHolder: {fileID: 114654720767678556}
+  myDamageReciever: {fileID: 114603721776678552}
 --- !u!114 &114603721776678552
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -560,6 +561,8 @@ MonoBehaviour:
   range: 100
   rb: {fileID: 0}
   col: {fileID: 0}
+  myAnimator: {fileID: 95524097079282068}
+  _canFireNextShot: 0
 --- !u!136 &136575353732643828
 CapsuleCollider:
   m_ObjectHideFlags: 1

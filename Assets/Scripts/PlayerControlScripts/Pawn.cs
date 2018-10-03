@@ -7,6 +7,31 @@ public class Pawn : MonoBehaviour {
     public advancedMoveScript myMoveScript;
     public lookScript myLookScript;
     public WeaponHolder myWeaponHolder;
+    public DamageReciever myDamageReciever;
+
+    public int Health
+    {
+        get
+        {
+            if(myDamageReciever)
+            {
+                return myDamageReciever.health;
+            }
+            return 0;
+        }
+    }
+
+    public int MaxHealth
+    {
+        get
+        {
+            if(myDamageReciever)
+            {
+                return myDamageReciever.maxHealth;
+            }
+            return 0;
+        }
+    }
 
     public virtual void OnTakeControl()
     {

@@ -16,8 +16,9 @@ public class SwordScript : weaponScript {
     protected Vector3 _lungeVector = Vector3.zero;
     protected Vector3 _lungeStartingPosition;
     protected float _maxLungeDistance;
+    protected bool _isLunging = false;
 
-    private void Start()
+    protected virtual void Start()
     {
         if(ownersCamera)
         {
@@ -35,11 +36,11 @@ public class SwordScript : weaponScript {
 
     protected virtual void FixedUpdate()
     {//If we can't fire next shot, then we can assume we are currently attacking.
-        if(!_canFireNextShot)
+        if(_isLunging)
         {
             if (Vector3.Distance(transform.position, _lungeStartingPosition) >= _maxLungeDistance)
             {
-                ResetCanFireShot();
+                ResetIsLunging();
             }
 
             if(_playerBody && _playerLookScript && _target)
@@ -55,9 +56,14 @@ public class SwordScript : weaponScript {
                 if(pv == _target)
                 {
                     pv.RPC("ApplyDamage", RpcTarget.All, damage);
-                    ResetCanFireShot();
+                    ResetIsLunging();
                 }
             }
+        }
+
+        if(!_canFireNextShot && !_isLunging)
+        {
+            ResetIsLunging();
         }
     }
 
@@ -65,7 +71,8 @@ public class SwordScript : weaponScript {
     {
         if(!_canFireNextShot) { return; }
 
-        //Start anim
+        myAnimator.SetBool("IsLunging", true);
+        _canFireNextShot = false;
 
         RaycastHit hit;
         Ray ray = ownersCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
@@ -87,7 +94,7 @@ public class SwordScript : weaponScript {
         
         if(_target)
         {
-            _canFireNextShot = false;
+            _isLunging = true;
             _lungeStartingPosition = transform.position;
             Vector3 targetDirection = _target.transform.position - ownersCamera.transform.position;
             _maxLungeDistance = targetDirection.magnitude;
@@ -96,13 +103,12 @@ public class SwordScript : weaponScript {
         }
     }
 
-    public override void ResetCanFireShot()
+    protected virtual void ResetIsLunging()
     {
-        base.ResetCanFireShot();
+        _isLunging = false;
         _target = null;
         _lungeVector = Vector3.zero;
         _playerMovement.letBeGrounded = true;
-        //_playerBody.velocity = Vector3.zero;
-        //End attack anim
+        myAnimator.SetBool("IsLunging", false);
     }
 }
