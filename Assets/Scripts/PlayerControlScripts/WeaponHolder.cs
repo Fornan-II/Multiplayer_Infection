@@ -38,4 +38,12 @@ public class WeaponHolder : MonoBehaviour {
             equippedWeapon = item;
         }
     }
+
+    public void LinkWeaponReticule(Reticule r)
+    {
+        if(equippedWeapon)
+        {
+            equippedWeapon.myReticule = r;
+        }
+    }
 }

@@ -34,8 +34,10 @@ public class SwordScript : weaponScript {
         }
     }
 
-    protected virtual void FixedUpdate()
-    {//If we can't fire next shot, then we can assume we are currently attacking.
+    protected override void FixedUpdate()
+    {
+        base.FixedUpdate();
+        //If we can't fire next shot, then we can assume we are currently attacking.
         if(_isLunging)
         {
             if (Vector3.Distance(transform.position, _lungeStartingPosition) >= _maxLungeDistance)
@@ -74,29 +76,12 @@ public class SwordScript : weaponScript {
         myAnimator.SetBool("IsLunging", true);
         _canFireNextShot = false;
 
-        RaycastHit hit;
-        Ray ray = ownersCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
-
-        if(Physics.Raycast(ray, out hit, range))
+        if(_hitPhotonView)
         {
-            _target = hit.transform.GetComponent<PhotonView>();
-
-            TeamBehavior tb = hit.transform.GetComponent<TeamBehavior>();
-
-            //No lunge or applied damage if target is on player's team.
-            if (tb && !ownersTeam.AllowsFriendlyFire && _target)
-            {
-                System.Type ownerType = ownersTeam.GetType();
-                System.Type hitType = tb.GetType();
-                if (ownerType == hitType) { _target = null; }
-            }
-        }
-        
-        if(_target)
-        {
+            _target = _hitPhotonView;
             _isLunging = true;
             _lungeStartingPosition = transform.position;
-            Vector3 targetDirection = _target.transform.position - ownersCamera.transform.position;
+            Vector3 targetDirection = _hitPhotonView.transform.position - ownersCamera.transform.position;
             _maxLungeDistance = targetDirection.magnitude;
             _lungeVector = targetDirection.normalized * LungeForce;
             _playerMovement.letBeGrounded = false;

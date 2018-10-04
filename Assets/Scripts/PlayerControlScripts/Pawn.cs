@@ -9,6 +9,8 @@ public class Pawn : MonoBehaviour {
     public WeaponHolder myWeaponHolder;
     public DamageReciever myDamageReciever;
 
+    protected PlayerController _controller;
+
     public int Health
     {
         get
@@ -33,11 +35,18 @@ public class Pawn : MonoBehaviour {
         }
     }
 
-    public virtual void OnTakeControl()
+    public virtual void OnTakeControl(PlayerController c)
     {
+        _controller = c;
+
         if (myLookScript)
         {
             myLookScript.lockState = true;
+        }
+
+        if(myWeaponHolder)
+        {
+            myWeaponHolder.LinkWeaponReticule(_controller.playerReticule);
         }
     }
 
@@ -47,6 +56,8 @@ public class Pawn : MonoBehaviour {
         {
             myLookScript.lockState = false;
         }
+
+        _controller = null;
     }
 
     public void Movement(Vector2 input)

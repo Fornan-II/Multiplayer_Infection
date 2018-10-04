@@ -510,7 +510,7 @@ MonoBehaviour:
   - {fileID: 114737030918208708}
   - {fileID: 114306992884863694}
   viewIdField: 0
-  InstantiationId: -1
+  InstantiationId: 1
   isRuntimeInstantiated: 0
 --- !u!114 &114719022726884804
 MonoBehaviour:
@@ -552,15 +552,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ownersCamera: {fileID: 20312307562329466}
+  myReticule: {fileID: 0}
   ownersTeam: {fileID: 114242804428146584}
   hitParticle: {fileID: 1800437452848824, guid: e43a8bd1cba21a54dbdb946b05efc854,
     type: 2}
-  damage: 0
+  damage: 100
   range: 10
   rb: {fileID: 0}
   col: {fileID: 0}
   myAnimator: {fileID: 95623302450855604}
-  _canFireNextShot: 0
+  _hitPhotonView: {fileID: 0}
   LungeForce: 3
   damageSphereRadius: 0.5
   damageSphereOffset: 1

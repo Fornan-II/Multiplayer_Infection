@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 
     public PlayerHUD playerHUD;
+    public Reticule playerReticule;
     public Pawn ControlledPawn { get { return _controlledPawn; } }
     protected Pawn _controlledPawn;
 
@@ -24,7 +25,7 @@ public class PlayerController : MonoBehaviour {
         }
 
         _controlledPawn = pawn;
-        _controlledPawn.OnTakeControl();
+        _controlledPawn.OnTakeControl(this);
 
         playerHUD.IsVisible(true);
 

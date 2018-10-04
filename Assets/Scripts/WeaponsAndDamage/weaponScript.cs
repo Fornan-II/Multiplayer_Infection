@@ -7,6 +7,7 @@ using Photon.Realtime;
 public class weaponScript : MonoBehaviour {
 
     public Camera ownersCamera;
+    public Reticule myReticule;
     public TeamBehavior ownersTeam;
     public GameObject hitParticle;
     public int damage = 30;
@@ -15,41 +16,72 @@ public class weaponScript : MonoBehaviour {
     public Collider col;
     public Animator myAnimator;
 
+    protected bool _validHit = false;
+    protected RaycastHit _hit;
     [SerializeField]
+    protected PhotonView _hitPhotonView;
     protected bool _canFireNextShot = false;
+
+    protected virtual void FixedUpdate()
+    {
+        if (myReticule)
+        {
+            Ray ray = ownersCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
+            if (Physics.Raycast(ray, out _hit, range))
+            {
+                _validHit = true;
+
+                _hitPhotonView = _hit.transform.GetComponent<PhotonView>();
+
+                TeamBehavior tb = _hit.transform.GetComponent<TeamBehavior>();
+                if (tb)
+                {
+                    if (!ownersTeam.AllowsFriendlyFire)
+                    {
+                        System.Type ownerType = ownersTeam.GetType();
+                        System.Type hitType = tb.GetType();
+                        if (ownerType == hitType)
+                        {
+                            //Prevent player from hitting friendlies (if team behavior dictates that)
+                            Debug.Log("Failing because friendly");
+                            _hitPhotonView = null;
+                        }
+                    }
+                }
+
+                if (_hitPhotonView)
+                {
+                    myReticule.HasTarget(true);
+                }
+                else
+                {
+                    myReticule.HasTarget(false);
+                }
+            }
+            else
+            {
+                myReticule.HasTarget(false);
+                _validHit = false;
+                _hitPhotonView = null;
+            }
+        }
+    }
 
     public virtual void FireShot()
     {
         if(!_canFireNextShot) { return; }
 
-        RaycastHit hit;
-        Ray ray = ownersCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
         myAnimator.SetTrigger("Attack");
         _canFireNextShot = false;
 
-        if(Physics.Raycast(ray, out hit, range))
+        if(_validHit)
         {
-            /*GameObject par = */PhotonNetwork.Instantiate(hitParticle.name, hit.point, hit.transform.rotation);
-            PhotonView pv = hit.transform.GetComponent<PhotonView>();
-            //Check for friendly fire
-            bool letDamage = true;
-            TeamBehavior tb = hit.transform.GetComponent<TeamBehavior>();
-            if(tb)
-            {
-                if(!ownersTeam.AllowsFriendlyFire)
-                {
-                    System.Type ownerType = ownersTeam.GetType();
-                    System.Type hitType = tb.GetType();
-                    if(ownerType == hitType)
-                    {
-                        letDamage = false;
-                    }
-                }
-            }
-            if (pv && letDamage)
+            /*GameObject par = */PhotonNetwork.Instantiate(hitParticle.name, _hit.point, _hit.transform.rotation);
+            
+            if (_hitPhotonView)
             {
                 //RPCs are basically calling a method over the network,
-                pv.RPC("ApplyDamage", RpcTarget.All, damage);
+                _hitPhotonView.RPC("ApplyDamage", RpcTarget.All, damage);
                 Debug.Log("Hit!");
             }
         }
