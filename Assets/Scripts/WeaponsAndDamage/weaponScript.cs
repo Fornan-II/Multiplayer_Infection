@@ -26,44 +26,43 @@ public class weaponScript : MonoBehaviour {
     {
         if (myReticule)
         {
+            Reticule.TargetType foundTargetType = Reticule.TargetType.NONE;
+
             Ray ray = ownersCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
             if (Physics.Raycast(ray, out _hit, range))
             {
                 _validHit = true;
 
                 _hitPhotonView = _hit.transform.GetComponent<PhotonView>();
+                if(_hitPhotonView)
+                {
+                    foundTargetType = Reticule.TargetType.ENEMY;
+                }
 
                 TeamBehavior tb = _hit.transform.GetComponent<TeamBehavior>();
                 if (tb)
                 {
-                    if (!ownersTeam.AllowsFriendlyFire)
+                    
+                    System.Type ownerType = ownersTeam.GetType();
+                    System.Type hitType = tb.GetType();
+                    if (ownerType == hitType)
                     {
-                        System.Type ownerType = ownersTeam.GetType();
-                        System.Type hitType = tb.GetType();
-                        if (ownerType == hitType)
+                        //Prevent player from hitting friendlies (if team behavior dictates that)
+                        foundTargetType = Reticule.TargetType.FRIENDLY;
+                        if(!ownersTeam.AllowsFriendlyFire)
                         {
-                            //Prevent player from hitting friendlies (if team behavior dictates that)
-                            Debug.Log("Failing because friendly");
                             _hitPhotonView = null;
                         }
                     }
                 }
-
-                if (_hitPhotonView)
-                {
-                    myReticule.HasTarget(true);
-                }
-                else
-                {
-                    myReticule.HasTarget(false);
-                }
             }
             else
             {
-                myReticule.HasTarget(false);
                 _validHit = false;
                 _hitPhotonView = null;
             }
+
+            myReticule.HasTarget(foundTargetType);
         }
     }
 

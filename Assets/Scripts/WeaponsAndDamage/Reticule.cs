@@ -5,7 +5,15 @@ using UnityEngine.UI;
 
 public class Reticule : MonoBehaviour
 {
-    public Color hasTargetColor;
+    public Color enemyTargetColor;
+    public Color friendlyTargetColor;
+
+    public enum TargetType
+    {
+        NONE,
+        FRIENDLY,
+        ENEMY
+    }
 
     protected Color _defaultColor;
     protected Image _myReticule;
@@ -23,13 +31,17 @@ public class Reticule : MonoBehaviour
         }
     }
 
-    public virtual void HasTarget(bool value)
+    public virtual void HasTarget(TargetType value)
     {
         if(!_myReticule) { return; }
 
-        if(value)
+        if(value == TargetType.ENEMY)
         {
-            _myReticule.color = hasTargetColor;
+            _myReticule.color = enemyTargetColor;
+        }
+        else if(value == TargetType.FRIENDLY)
+        {
+            _myReticule.color = friendlyTargetColor;
         }
         else
         {
