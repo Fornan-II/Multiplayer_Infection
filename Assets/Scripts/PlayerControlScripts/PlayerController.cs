@@ -28,16 +28,21 @@ public class PlayerController : MonoBehaviour {
         _controlledPawn.OnTakeControl(this);
 
         playerHUD.IsVisible(true);
+        playerReticule.gameObject.SetActive(true);
 
         return true;
     }
 
     protected void ReleaseControl()
     {
-        _controlledPawn.OnReleasedControl();
-        _controlledPawn = null;
+        if(_controlledPawn)
+        {
+            _controlledPawn.OnReleasedControl();
+            _controlledPawn = null;
+        }
 
         playerHUD.IsVisible(false);
+        playerReticule.gameObject.SetActive(false);
     }
 
     protected void Update()

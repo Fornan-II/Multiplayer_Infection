@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using ExitGames.Client.Photon;
 
 public class roomManager : MonoBehaviourPunCallbacks {
 
@@ -11,6 +12,18 @@ public class roomManager : MonoBehaviourPunCallbacks {
     public GameObject zombiePrefab;
 
     public PlayerController playerController;
+
+    public ExitGames.Client.Photon.Hashtable RoomProperties
+    {
+        get
+        {
+            return PhotonNetwork.CurrentRoom.CustomProperties;
+        }
+        set
+        {
+            PhotonNetwork.CurrentRoom.SetCustomProperties(value);
+        }
+    }
 
     public enum PlayerType
     {
@@ -38,9 +51,10 @@ public class roomManager : MonoBehaviourPunCallbacks {
     {
         Debug.Log("Room joined");
         isConnected = true;
-        StartCoroutine(WaitForTeamSelection());
 
-        Debug.Log("Player count: " + PhotonNetwork.CurrentRoom.PlayerCount);
+        RoomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
+
+        StartCoroutine(WaitForTeamSelection());
     }
 
     public void SpawnPlayer()
@@ -50,8 +64,6 @@ public class roomManager : MonoBehaviourPunCallbacks {
         string prefabName = "";
         if (myPlayerType == PlayerType.HUMAN) { prefabName = humanPrefab.name; }
         else if (myPlayerType == PlayerType.ZOMBIE) { prefabName = zombiePrefab.name; }
-
-        Debug.Log(prefabName);
 
         GameObject player = SpawnPoint.SpawnPlayerAtRandomPoint(prefabName, myPlayerType == PlayerType.ZOMBIE);
 
@@ -104,5 +116,10 @@ public class roomManager : MonoBehaviourPunCallbacks {
         }
 
         SpawnPlayer();
+    }
+
+    public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
+    {
+        base.OnRoomPropertiesUpdate(propertiesThatChanged);
     }
 }

@@ -50,7 +50,7 @@ GameObject:
   - component: {fileID: 114654720767678556}
   m_Layer: 8
   m_Name: playerHuman
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -554,6 +554,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ownersCamera: {fileID: 20312307562329466}
+  myReticule: {fileID: 0}
   ownersTeam: {fileID: 114167211767056408}
   hitParticle: {fileID: 1800437452848824, guid: e43a8bd1cba21a54dbdb946b05efc854,
     type: 2}
@@ -562,7 +563,7 @@ MonoBehaviour:
   rb: {fileID: 0}
   col: {fileID: 0}
   myAnimator: {fileID: 95524097079282068}
-  _canFireNextShot: 0
+  _hitPhotonView: {fileID: 0}
 --- !u!136 &136575353732643828
 CapsuleCollider:
   m_ObjectHideFlags: 1
