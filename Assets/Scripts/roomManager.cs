@@ -39,6 +39,8 @@ public class roomManager : MonoBehaviourPunCallbacks {
         Debug.Log("Room joined");
         isConnected = true;
         StartCoroutine(WaitForTeamSelection());
+
+        Debug.Log("Player count: " + PhotonNetwork.CurrentRoom.PlayerCount);
     }
 
     public void SpawnPlayer()
@@ -48,7 +50,9 @@ public class roomManager : MonoBehaviourPunCallbacks {
         string prefabName = "";
         if (myPlayerType == PlayerType.HUMAN) { prefabName = humanPrefab.name; }
         else if (myPlayerType == PlayerType.ZOMBIE) { prefabName = zombiePrefab.name; }
-        
+
+        Debug.Log(prefabName);
+
         GameObject player = SpawnPoint.SpawnPlayerAtRandomPoint(prefabName, myPlayerType == PlayerType.ZOMBIE);
 
         DamageReciever dr = player.GetComponent<DamageReciever>();
@@ -84,6 +88,12 @@ public class roomManager : MonoBehaviourPunCallbacks {
         //No idea if this'll work or cause more sync errors
         Pawn p = player.GetComponent<Pawn>();
         playerController.TakeControlOf(p);
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            GameObject debugBall = PhotonNetwork.Instantiate("DebugBall", player.transform.position, player.transform.rotation);
+            debugBall.transform.parent = player.transform;
+        }
     }
 
     protected IEnumerator WaitForTeamSelection()
