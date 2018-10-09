@@ -13,15 +13,29 @@ public class roomManager : MonoBehaviourPunCallbacks {
 
     public PlayerController playerController;
 
+    protected ExitGames.Client.Photon.Hashtable _roomProperties;
+
     public ExitGames.Client.Photon.Hashtable RoomProperties
     {
         get
         {
-            return PhotonNetwork.CurrentRoom.CustomProperties;
+            return _roomProperties;
         }
         set
         {
             PhotonNetwork.CurrentRoom.SetCustomProperties(value);
+        }
+    }
+
+    public bool RoomCanBeJoined
+    {
+        get
+        {
+            return PhotonNetwork.CurrentRoom.IsOpen;
+        }
+        set
+        {
+            PhotonNetwork.CurrentRoom.IsOpen = value;
         }
     }
 
@@ -100,12 +114,6 @@ public class roomManager : MonoBehaviourPunCallbacks {
         //No idea if this'll work or cause more sync errors
         Pawn p = player.GetComponent<Pawn>();
         playerController.TakeControlOf(p);
-
-        if (PhotonNetwork.IsMasterClient)
-        {
-            GameObject debugBall = PhotonNetwork.Instantiate("DebugBall", player.transform.position, player.transform.rotation);
-            debugBall.transform.parent = player.transform;
-        }
     }
 
     protected IEnumerator WaitForTeamSelection()
@@ -120,6 +128,6 @@ public class roomManager : MonoBehaviourPunCallbacks {
 
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
     {
-        base.OnRoomPropertiesUpdate(propertiesThatChanged);
+        _roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
     }
 }
