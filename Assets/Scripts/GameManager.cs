@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour {
 
     [Range(0.0f, 1.0f)]
     public float StarterZombiePercentage = 0.25f;
-    public float ZombieSpawnTime = 30.0f;
+    public float TimeBeforeZombieSpawn = 30.0f;
     public float MaxGameTime = -1.0f;
     public float AutoGameStartTime = 60.0f;
     protected float _preGameRemainingTime;
@@ -66,35 +66,14 @@ public class GameManager : MonoBehaviour {
         }
 
         LocalClientOperations();
-
-        if(!_gameIsRunning)
-        {
-            object gameRunningObj;
-            if (myRoom.RoomProperties.TryGetValue("bool_GameStarted", out gameRunningObj))
-            {
-                if ((bool)gameRunningObj)
-                {
-                    _gameIsRunning = true;
-                }
-            }
-        }
-        else
-        {
-            if(_IsMasterClient)
-            {
-                
-            }
-
-            object startTimeObj;
-            if(myRoom.RoomProperties.TryGetValue("double_StartTime", out startTimeObj))
-            {
-                _gameTimeElapsed = (float)(PhotonNetwork.Time - (double)startTimeObj);
-            }
-        }
     }
 
     protected virtual void MasterClientOperations()
     {
+        //Just to make sure
+        if(!PhotonNetwork.IsMasterClient) { return; }
+
+        //If game hasn't started yet, tell the server to get ready to start the game
         if ((PhotonNetwork.CurrentRoom.PlayerCount >= PlayerCountMinimum) && !_gameIsRunning)
         {
             //Room properties
@@ -119,6 +98,7 @@ public class GameManager : MonoBehaviour {
 
     protected virtual void LocalClientOperations()
     {
+        //Get ready to start game if Server says so.
         object preGameStartTime;
         if(myRoom.RoomProperties.TryGetValue("double_PreGameCountDownStart", out preGameStartTime))
         {
@@ -146,48 +126,37 @@ public class GameManager : MonoBehaviour {
                 GameStartSetup();
             }
         }
-    }
 
-    /*protected virtual IEnumerator GameStartCountDown()
-    {
-        if (!_gameStartCountdownStarted)
+        if (!_gameIsRunning)
         {
-            _gameStartCountdownStarted = true;
-
-            
-
-            _preGameRemainingTime = AutoGameStartTime;
-            bool allPlayersReady = false;
-
-            //Wait for the time to go past or for all players to ready up.
-            while((_preGameRemainingTime > 0) && !allPlayersReady)
+            object gameRunningObj;
+            if (myRoom.RoomProperties.TryGetValue("bool_GameStarted", out gameRunningObj))
             {
-                List<Player> allPlayers = new List<Player>(PhotonNetwork.CurrentRoom.Players.Values);
-                allPlayersReady = true;
-                for(int i = 0; (i < allPlayers.Count) && allPlayersReady; i++)
+                if ((bool)gameRunningObj)
                 {
-                    object playerReady;
-                    Debug.Log("index " + i + "\nAllReady = " + allPlayersReady);
-                    if(allPlayers[i].CustomProperties.TryGetValue("bool_PlayerReady", out playerReady))
-                    {
-                        if(!(bool)playerReady)
-                        {
-                            allPlayersReady = false;
-                        }
-                    }
+                    GameStartSetup();
                 }
-
-                Debug.Log("Game countdown " + _preGameRemainingTime);
-
-                yield return null;
-                _preGameRemainingTime -= Time.deltaTime;
+            }
+        }
+        else
+        {
+            //Game is running. If zombies haven't spawned yet, spawn them if enough time has passed.
+            if (_IsMasterClient)
+            {
+                object zombiesSpawnedObj;
+                if (!myRoom.RoomProperties.TryGetValue("bool_ZombiesSpawned", out zombiesSpawnedObj) && _gameTimeElapsed > TimeBeforeZombieSpawn)
+                {
+                    FigureOutWhoToMurderAndMakeIntoZombies();
+                }
             }
 
-            Debug.Log("Game started!");
-            //Game Start
-            GameStartSetup();
+            object startTimeObj;
+            if (myRoom.RoomProperties.TryGetValue("double_StartTime", out startTimeObj))
+            {
+                _gameTimeElapsed = (float)(PhotonNetwork.Time - (double)startTimeObj);
+            }
         }
-    }*/
+    }
 
     public virtual void SetPlayerReady(bool value)
     {
@@ -216,6 +185,30 @@ public class GameManager : MonoBehaviour {
         myRoom.myPlayerType = roomManager.PlayerType.HUMAN;
     }
 
+    protected virtual void FigureOutWhoToMurderAndMakeIntoZombies()
+    {
+        ExitGames.Client.Photon.Hashtable newProperties = new ExitGames.Client.Photon.Hashtable
+            {
+                { "bool_MarkedForDeath", true }
+            };
+        List<Player> SelectablePlayers = new List<Player>(PhotonNetwork.PlayerList);
+
+        int starterZombieCount = (int)(SelectablePlayers.Count * StarterZombiePercentage);
+        if(starterZombieCount < 1) { starterZombieCount = 1; }
+
+        for(int c = 0; (c <= starterZombieCount) && (SelectablePlayers.Count > 1); c++)
+        {
+            int index = Random.Range(0, SelectablePlayers.Count);
+            SelectablePlayers[index].SetCustomProperties(newProperties);
+            SelectablePlayers.RemoveAt(index);
+        }
+
+
+        newProperties.Clear();
+        newProperties.Add("bool_ZombiesSpawned", true);
+        myRoom.RoomProperties = newProperties;
+    }
+
     protected virtual void OnGUI()
     {
         if(!_gameIsRunning)
@@ -240,12 +233,12 @@ public class GameManager : MonoBehaviour {
                 {
                     GUI.Box(new Rect(Screen.width - 130, 10, 120, 43), "Game will start\nin " + (int)_preGameRemainingTime + " seconds.");
                 }
-                GUI.Box(new Rect(10, 10, 100, 43), PhotonNetwork.CurrentRoom.PlayerCount + " of " + PlayerCountMinimum + " players\n" + readyPlayerCount + " players ready");
+                GUI.Box(new Rect(10, 10, 100, 40), PhotonNetwork.CurrentRoom.PlayerCount + " of " + PlayerCountMinimum + " players\n" + readyPlayerCount + " players ready");
                 
             }
             else
             {
-                GUI.Box(new Rect(10, 10, 100, 29), "0 of " + PlayerCountMinimum + " players");
+                GUI.Box(new Rect(10, 10, 100, 25), "0 of " + PlayerCountMinimum + " players");
             }
         }
 
@@ -263,7 +256,7 @@ public class GameManager : MonoBehaviour {
                 message += seconds;
             }
 
-            GUI.Box(new Rect(Screen.width - 110, 10, 100, 29), message);
+            GUI.Box(new Rect(Screen.width - 110, 10, 100, 25), message);
         }
     }
 }

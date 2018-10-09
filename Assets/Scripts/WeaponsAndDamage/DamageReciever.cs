@@ -26,6 +26,17 @@ public class DamageReciever : MonoBehaviour {
     [PunRPC]
     public void ApplyDamage(int dmg)
     {
+        PhotonView pv = gameObject.GetComponent<PhotonView>();
+        if(pv)
+        {
+            if(!pv.IsMine) { return; }
+        }
+        else
+        {
+            Debug.LogError("DamageReciever has no PhotonView!");
+            return;
+        }
+
         health -= dmg;
         if(health <= 0.0f && !_isDying)
         {
