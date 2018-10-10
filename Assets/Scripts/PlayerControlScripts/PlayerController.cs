@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 public class PlayerController : MonoBehaviour {
 
@@ -43,6 +44,16 @@ public class PlayerController : MonoBehaviour {
 
         playerHUD.IsVisible(false);
         playerReticule.gameObject.SetActive(false);
+    }
+
+    public bool MurderPawn()
+    {
+        if(!ControlledPawn) { return false; }
+
+        PhotonView pv = ControlledPawn.GetComponent<PhotonView>();
+        if(!pv) { return false; }
+        pv.RPC("ApplyDamage", RpcTarget.All, 666);
+        return true;
     }
 
     protected void Update()

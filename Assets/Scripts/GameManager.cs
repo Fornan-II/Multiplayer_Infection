@@ -20,12 +20,20 @@ public class GameManager : MonoBehaviour {
     public float AutoGameStartTime = 60.0f;
     protected float _preGameRemainingTime;
 
-    protected float _gameTimeElapsed = -1.0f;
+    protected float _gameTimeElapsed = 0.0f;
 
     protected bool _playerIsReady = false;
+    protected bool _playerInitialized = false;
+    public enum GameState
+    {
+        PREGAME,
+        PREPARATION_PHASE,
+        GAME_RUNNING,
+        GAME_END
+    }
+    protected GameState _currentGameState = GameState.PREGAME;
 
-    protected bool _gameIsRunning = false;
-    public bool GameIsRunning { get { return _gameIsRunning; } }
+    public GameState CurrentGameState { get { return _currentGameState; } }
 
     protected virtual void Start()
     {
@@ -53,8 +61,10 @@ public class GameManager : MonoBehaviour {
     {
         if(!myRoom.isConnected) { return; }
 
+        Debug.Log("Current Game State: " + _currentGameState);
+
         //Check to see if this client is the Master Client
-        if(PhotonNetwork.IsMasterClient != _IsMasterClient)
+        if (PhotonNetwork.IsMasterClient != _IsMasterClient)
         {
             _IsMasterClient = PhotonNetwork.IsMasterClient;
         }
@@ -74,12 +84,12 @@ public class GameManager : MonoBehaviour {
         if(!PhotonNetwork.IsMasterClient) { return; }
 
         //If game hasn't started yet, tell the server to get ready to start the game
-        if ((PhotonNetwork.CurrentRoom.PlayerCount >= PlayerCountMinimum) && !_gameIsRunning)
+        if ((PhotonNetwork.CurrentRoom.PlayerCount >= PlayerCountMinimum) && _currentGameState == GameState.PREGAME)
         {
             //Room properties
             ExitGames.Client.Photon.Hashtable newProperties = new ExitGames.Client.Photon.Hashtable
                 {
-                    { "bool_GameStarted", _gameIsRunning }
+                    { "enum_CurrentGameState", _currentGameState }
                 };
 
             if (!myRoom.RoomProperties.ContainsKey("double_PreGameCountDownStart"))
@@ -90,70 +100,111 @@ public class GameManager : MonoBehaviour {
             myRoom.RoomProperties = newProperties;
         }
 
-        if(_gameIsRunning)
+        if(_currentGameState == GameState.PREPARATION_PHASE)
         {
-            //Wait until setup time is over then murder some humans
+            //Game is running. If zombies haven't spawned yet, spawn them if enough time has passed.
+            if (_gameTimeElapsed > TimeBeforeZombieSpawn)
+            {
+                FigureOutWhoToMurderAndMakeIntoZombies();
+            }
+        }
+
+        if(_currentGameState == GameState.PREPARATION_PHASE || _currentGameState == GameState.GAME_RUNNING)
+        {
+            bool humansRemain = false;
+            bool isHumanInitialized = false;
+            for (int i = 0; (i < PhotonNetwork.PlayerList.Length) && !humansRemain; i++)
+            {
+                object isHuman;
+                if (PhotonNetwork.PlayerList[i].CustomProperties.TryGetValue("bool_IsHuman", out isHuman))
+                {
+                    isHumanInitialized = true;
+                    if ((bool)isHuman)
+                    {
+                        humansRemain = true;
+                    }
+                }
+            }
+            if (isHumanInitialized && !humansRemain)
+            {
+                EndGame();
+            }
         }
     }
 
     protected virtual void LocalClientOperations()
     {
-        //Get ready to start game if Server says so.
-        object preGameStartTime;
-        if(myRoom.RoomProperties.TryGetValue("double_PreGameCountDownStart", out preGameStartTime))
+        //Update Game state
+        object gameStateObj;
+        if (myRoom.RoomProperties.TryGetValue("enum_CurrentGameState", out gameStateObj))
         {
-            //Run auto-start timer
-            float preGameElapsedTime = (float)(PhotonNetwork.Time - (double)preGameStartTime);
-            _preGameRemainingTime = AutoGameStartTime - preGameElapsedTime;
-
-            //Check to see if all players are ready
-            List<Player> allPlayers = new List<Player>(PhotonNetwork.CurrentRoom.Players.Values);
-            bool allPlayersReady = true;
-            for (int i = 0; (i < allPlayers.Count) && allPlayersReady; i++)
+            if ((GameState)gameStateObj != _currentGameState)
             {
-                object playerReady;
-                if (allPlayers[i].CustomProperties.TryGetValue("bool_PlayerReady", out playerReady))
-                {
-                    if (!(bool)playerReady)
-                    {
-                        allPlayersReady = false;
-                    }
-                }
-            }
-
-            if (_preGameRemainingTime <= 0.0f || allPlayersReady)
-            {
-                GameStartSetup();
+                _currentGameState = (GameState)gameStateObj;
             }
         }
 
-        if (!_gameIsRunning)
+        if(_currentGameState == GameState.PREGAME)
         {
-            object gameRunningObj;
-            if (myRoom.RoomProperties.TryGetValue("bool_GameStarted", out gameRunningObj))
+            //Get ready to start game if Server says so.
+            object preGameStartTime;
+            if (myRoom.RoomProperties.TryGetValue("double_PreGameCountDownStart", out preGameStartTime))
             {
-                if ((bool)gameRunningObj)
+                //Run auto-start timer
+                float preGameElapsedTime = (float)(PhotonNetwork.Time - (double)preGameStartTime);
+                _preGameRemainingTime = AutoGameStartTime - preGameElapsedTime;
+
+                //Check to see if all players are ready
+                List<Player> allPlayers = new List<Player>(PhotonNetwork.CurrentRoom.Players.Values);
+                bool allPlayersReady = true;
+                for (int i = 0; (i < allPlayers.Count) && allPlayersReady; i++)
+                {
+                    object playerReady;
+                    if (allPlayers[i].CustomProperties.TryGetValue("bool_PlayerReady", out playerReady))
+                    {
+                        if (!(bool)playerReady)
+                        {
+                            allPlayersReady = false;
+                        }
+                    }
+                }
+
+                if (_preGameRemainingTime <= 0.0f || allPlayersReady)
                 {
                     GameStartSetup();
                 }
             }
         }
-        else
-        {
-            //Game is running. If zombies haven't spawned yet, spawn them if enough time has passed.
-            if (_IsMasterClient)
-            {
-                object zombiesSpawnedObj;
-                if (!myRoom.RoomProperties.TryGetValue("bool_ZombiesSpawned", out zombiesSpawnedObj) && _gameTimeElapsed > TimeBeforeZombieSpawn)
-                {
-                    FigureOutWhoToMurderAndMakeIntoZombies();
-                }
-            }
 
+        if(_currentGameState == GameState.PREPARATION_PHASE)
+        {
+            if(!_playerInitialized)
+            {
+                GameStartSetup();
+            }
+        }
+
+        if(_currentGameState == GameState.PREPARATION_PHASE || _currentGameState == GameState.GAME_RUNNING)
+        {
             object startTimeObj;
             if (myRoom.RoomProperties.TryGetValue("double_StartTime", out startTimeObj))
             {
                 _gameTimeElapsed = (float)(PhotonNetwork.Time - (double)startTimeObj);
+            }
+        }
+
+        if (_currentGameState == GameState.GAME_RUNNING)
+        {
+            if(myRoom.myPlayerType == roomManager.PlayerType.HUMAN)
+            {
+                object IsHuman;
+                if(PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("bool_IsHuman", out IsHuman))
+                {
+                    if(!(bool)IsHuman)
+                    {
+                        myRoom.playerController.MurderPawn();
+                    }
+                }
             }
         }
     }
@@ -174,44 +225,91 @@ public class GameManager : MonoBehaviour {
         {
             ExitGames.Client.Photon.Hashtable newProperties = new ExitGames.Client.Photon.Hashtable
             {
-                { "bool_GameStarted", true },
-                { "double_StartTime", PhotonNetwork.Time },
+                { "enum_CurrentGameState", GameState.PREPARATION_PHASE },
                 { "double_PreGameCountDownStart", null }
             };
+
+            if(!myRoom.RoomProperties.ContainsKey("double_StartTime"))
+            {
+                newProperties.Add("double_StartTime", PhotonNetwork.Time);
+            }
+
             myRoom.RoomProperties = newProperties;
         }
 
-        _gameIsRunning = true;
+        _playerInitialized = true;
+        _currentGameState = GameState.PREPARATION_PHASE;
         myRoom.myPlayerType = roomManager.PlayerType.HUMAN;
+    }
+
+    protected virtual void EndGame()
+    {
+        if (_IsMasterClient)
+        {
+            ExitGames.Client.Photon.Hashtable newProperties = new ExitGames.Client.Photon.Hashtable
+            {
+                { "enum_CurrentGameState", GameState.GAME_END }
+            };
+            myRoom.RoomProperties = newProperties;
+            myRoom.CloseRoom();
+        }
     }
 
     protected virtual void FigureOutWhoToMurderAndMakeIntoZombies()
     {
+        if(!_IsMasterClient) { return; }
+
         ExitGames.Client.Photon.Hashtable newProperties = new ExitGames.Client.Photon.Hashtable
             {
-                { "bool_MarkedForDeath", true }
+                { "bool_IsHuman", false }
             };
         List<Player> SelectablePlayers = new List<Player>(PhotonNetwork.PlayerList);
 
         int starterZombieCount = (int)(SelectablePlayers.Count * StarterZombiePercentage);
         if(starterZombieCount < 1) { starterZombieCount = 1; }
 
-        for(int c = 0; (c <= starterZombieCount) && (SelectablePlayers.Count > 1); c++)
+        //Remove players who are already zombies
+        for (int i = 0; i < SelectablePlayers.Count; i++)
         {
+            object isAlreadyHuman;
+            if (SelectablePlayers[i].CustomProperties.TryGetValue("bool_IsHuman", out isAlreadyHuman))
+            {
+                if((bool)isAlreadyHuman)
+                {
+                    SelectablePlayers.RemoveAt(i);
+                    i--;
+                    starterZombieCount--;
+                }
+            }
+        }
+
+        //Pick a few players to make into zombies
+        for (int c = 0; (c < starterZombieCount) && (SelectablePlayers.Count > 1); c++)
+        {
+            Debug.Log("Picking player for zombie (" + starterZombieCount + " starter zombies)");
             int index = Random.Range(0, SelectablePlayers.Count);
             SelectablePlayers[index].SetCustomProperties(newProperties);
             SelectablePlayers.RemoveAt(index);
         }
 
+        newProperties.Clear();
+        newProperties.Add("bool_IsHuman", true);
+        //Mark the rest of the players as humans
+        foreach(Player p in SelectablePlayers)
+        {
+            p.SetCustomProperties(newProperties);
+        }
 
         newProperties.Clear();
-        newProperties.Add("bool_ZombiesSpawned", true);
+        newProperties.Add("enum_CurrentGameState", GameState.GAME_RUNNING);
         myRoom.RoomProperties = newProperties;
+        //Make the room no longer joinable
+        myRoom.RoomCanBeJoined = false;
     }
 
     protected virtual void OnGUI()
     {
-        if(!_gameIsRunning)
+        if(_currentGameState == GameState.PREGAME)
         {
             int readyPlayerCount = 0;
             foreach(Player p in PhotonNetwork.PlayerList)
@@ -242,7 +340,7 @@ public class GameManager : MonoBehaviour {
             }
         }
 
-        if(_gameTimeElapsed > 0.0f)
+        if(_currentGameState == GameState.PREPARATION_PHASE || _currentGameState == GameState.GAME_RUNNING)
         {
             int minutes = (int)_gameTimeElapsed / 60;
             int seconds = (int)_gameTimeElapsed % 60;

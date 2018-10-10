@@ -20,7 +20,7 @@ public class ReadyUpButton : MonoBehaviour {
 
     private void Update()
     {
-        if(myGameManager.GameIsRunning)
+        if(myGameManager.CurrentGameState != GameManager.GameState.PREGAME)
         {
             gameObject.SetActive(false);
         }

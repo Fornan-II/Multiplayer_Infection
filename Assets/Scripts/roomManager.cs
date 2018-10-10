@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using ExitGames.Client.Photon;
+using Photon.Realtime;
 
 public class roomManager : MonoBehaviourPunCallbacks {
 
@@ -71,13 +72,43 @@ public class roomManager : MonoBehaviourPunCallbacks {
         StartCoroutine(WaitForTeamSelection());
     }
 
+    public override void OnLeftRoom()
+    {
+        Debug.Log("Room left");
+        isConnected = false;
+
+        //PhotonNetwork.JoinOrCreateRoom(roomName, null, null);
+    }
+
+    public void CloseRoom()
+    {
+        RoomCanBeJoined = false;
+        PhotonNetwork.LeaveRoom();
+    }
+
     public void SpawnPlayer()
     {
         if(myPlayerType == PlayerType.SPECTATOR) { return; }
 
         string prefabName = "";
-        if (myPlayerType == PlayerType.HUMAN) { prefabName = humanPrefab.name; }
-        else if (myPlayerType == PlayerType.ZOMBIE) { prefabName = zombiePrefab.name; }
+        if (myPlayerType == PlayerType.HUMAN)
+        {
+            ExitGames.Client.Photon.Hashtable newProperties = new ExitGames.Client.Photon.Hashtable
+                        {
+                            { "bool_IsHuman", true }
+                        };
+            PhotonNetwork.SetPlayerCustomProperties(newProperties);
+            prefabName = humanPrefab.name;
+        }
+        else if (myPlayerType == PlayerType.ZOMBIE)
+        {
+            ExitGames.Client.Photon.Hashtable newProperties = new ExitGames.Client.Photon.Hashtable
+                        {
+                            { "bool_IsHuman", false }
+                        };
+            PhotonNetwork.SetPlayerCustomProperties(newProperties);
+            prefabName = zombiePrefab.name;
+        }
 
         GameObject player = SpawnPoint.SpawnPlayerAtRandomPoint(prefabName, myPlayerType == PlayerType.ZOMBIE);
 
