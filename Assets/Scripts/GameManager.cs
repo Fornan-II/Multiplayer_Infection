@@ -207,6 +207,14 @@ public class GameManager : MonoBehaviour {
                 }
             }
         }
+
+        if(_currentGameState == GameState.GAME_END)
+        {
+            if(myRoom.isConnected)
+            {
+                myRoom.LeaveRoom();
+            }
+        }
     }
 
     public virtual void SetPlayerReady(bool value)
@@ -251,7 +259,7 @@ public class GameManager : MonoBehaviour {
                 { "enum_CurrentGameState", GameState.GAME_END }
             };
             myRoom.RoomProperties = newProperties;
-            myRoom.CloseRoom();
+            myRoom.RoomCanBeJoined = false;
         }
     }
 
@@ -271,10 +279,10 @@ public class GameManager : MonoBehaviour {
         //Remove players who are already zombies
         for (int i = 0; i < SelectablePlayers.Count; i++)
         {
-            object isAlreadyHuman;
-            if (SelectablePlayers[i].CustomProperties.TryGetValue("bool_IsHuman", out isAlreadyHuman))
+            object isHuman;
+            if (SelectablePlayers[i].CustomProperties.TryGetValue("bool_IsHuman", out isHuman))
             {
-                if((bool)isAlreadyHuman)
+                if(!(bool)isHuman)
                 {
                     SelectablePlayers.RemoveAt(i);
                     i--;

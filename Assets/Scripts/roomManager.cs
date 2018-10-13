@@ -7,6 +7,8 @@ using Photon.Realtime;
 
 public class roomManager : MonoBehaviourPunCallbacks {
 
+    public static roomManager Self;
+
     public string roomName = "defaultRoom";
 
     public GameObject humanPrefab;
@@ -15,7 +17,6 @@ public class roomManager : MonoBehaviourPunCallbacks {
     public PlayerController playerController;
 
     protected ExitGames.Client.Photon.Hashtable _roomProperties;
-
     public ExitGames.Client.Photon.Hashtable RoomProperties
     {
         get
@@ -40,6 +41,9 @@ public class roomManager : MonoBehaviourPunCallbacks {
         }
     }
 
+    protected List<RoomInfo> _roomList;
+    public List<RoomInfo> RoomList { get { return _roomList; } }
+
     public enum PlayerType
     {
         SPECTATOR,
@@ -50,6 +54,20 @@ public class roomManager : MonoBehaviourPunCallbacks {
 
     public bool isConnected = false;
 
+    private void Awake()
+    {
+        //Making this class a singleton
+        /*if(Self)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Self = this;
+            DontDestroyOnLoad(gameObject);
+        }*/
+    }
+
     private void Start()
     {
         PhotonNetwork.ConnectUsingSettings();
@@ -59,7 +77,12 @@ public class roomManager : MonoBehaviourPunCallbacks {
     public override void OnConnectedToMaster()
     {
         Debug.Log("Master connected to.");
-        PhotonNetwork.JoinOrCreateRoom(roomName, null, null);
+        PhotonNetwork.JoinLobby();
+    }
+
+    public override void OnJoinedLobby()
+    {
+        PhotonNetwork.JoinOrCreateRoom(roomName, null, PhotonNetwork.CurrentLobby);
     }
 
     public override void OnJoinedRoom()
@@ -80,15 +103,34 @@ public class roomManager : MonoBehaviourPunCallbacks {
         //PhotonNetwork.JoinOrCreateRoom(roomName, null, null);
     }
 
-    public void CloseRoom()
+    public void JoinRoom(string roomName)
     {
-        RoomCanBeJoined = false;
-        PhotonNetwork.LeaveRoom();
+        PhotonNetwork.JoinRoom(roomName);
     }
 
+    public void CreateRoom(string roomName)
+    {
+        PhotonNetwork.CreateRoom(roomName, null, PhotonNetwork.CurrentLobby, null);
+    }
+
+    public void LeaveRoom()
+    {
+        if(!isConnected)
+        {
+            Debug.LogWarning("Can not leave room when there is no room connected to.");
+            return;
+        }
+
+        Debug.Log("Leaving room...");
+        PhotonNetwork.LeaveRoom();
+        myPlayerType = PlayerType.SPECTATOR;
+        playerController.TakeControlOf(null);
+    }
+
+    #region Stuff that should be moved to another class
     public void SpawnPlayer()
     {
-        if(myPlayerType == PlayerType.SPECTATOR) { return; }
+        if(myPlayerType == PlayerType.SPECTATOR || !isConnected) { return; }
 
         string prefabName = "";
         if (myPlayerType == PlayerType.HUMAN)
@@ -156,9 +198,16 @@ public class roomManager : MonoBehaviourPunCallbacks {
 
         SpawnPlayer();
     }
+#endregion
 
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
     {
         _roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
+    }
+
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+        base.OnRoomListUpdate(roomList);
+        _roomList = roomList;
     }
 }

@@ -66,7 +66,7 @@ public class SpawnPoint : MonoBehaviour {
 
     protected virtual GameObject SpawnPlayer(string prefabLocation)
     {
-        Debug.Log("Spawning player at " + name);
+        //Debug.Log("Spawning player at " + name);
         CurrentState = SpawnPointState.INVALID;
         return PhotonNetwork.Instantiate(prefabLocation, transform.position, transform.rotation) as GameObject;
     }
