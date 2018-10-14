@@ -9,6 +9,7 @@ public class RoomSearcher : MonoBehaviour {
 
     public Text QueryButtonText;
     public Text RoomStatusText;
+    public Text RoomNameField;
 
     public enum SearcherState
     {
@@ -19,8 +20,7 @@ public class RoomSearcher : MonoBehaviour {
     }
     public SearcherState CurrentState = SearcherState.QUERY;
 
-    [HideInInspector]
-    public string RoomName = "";
+    protected string _roomName = "";
 
     private void Start()
     {
@@ -32,12 +32,17 @@ public class RoomSearcher : MonoBehaviour {
         {
             Debug.LogWarning(name + " does not have RoomStatusText assigned!");
         }
+        if (!RoomNameField)
+        {
+            Debug.LogWarning(name + " does not have RoomNameField assigned!");
+        }
     }
 
     public void RoomNameTextOnChange()
     {
         CurrentState = SearcherState.QUERY;
-        QueryButtonText.text = "Search For Room...";
+        QueryButtonText.text = "Search for room...";
+        _roomName = RoomNameField.text;
     }
 
     public void QueryButtonAction()
@@ -48,12 +53,12 @@ public class RoomSearcher : MonoBehaviour {
         else if(CurrentState == SearcherState.CREATE) { CreateRoom(); }
     }
 
-    public void QueryRoom()
+    protected void QueryRoom()
     {
         RoomInfo foundRoom = null;
         for(int i = 0; (i < roomManager.Self.roomName.Length) && (foundRoom == null); i++)
         {
-            if(roomManager.Self.RoomList[i].Name == RoomName)
+            if(roomManager.Self.RoomList[i].Name == _roomName)
             {
                 foundRoom = roomManager.Self.RoomList[i];
             }
@@ -63,7 +68,7 @@ public class RoomSearcher : MonoBehaviour {
         {
             CurrentState = SearcherState.CREATE;
             RoomStatusText.text = "No room of this name found.";
-            QueryButtonText.text = "Create Room";
+            QueryButtonText.text = "Create room";
         }
         else
         {
@@ -89,26 +94,26 @@ public class RoomSearcher : MonoBehaviour {
                     newStatusText += "Currently waiting for the game to start.";
                 }
 
-                QueryButtonText.text = "Join Game";
+                QueryButtonText.text = "Join game";
             }
             else
             {
                 newStatusText += "Game already in progress, can not join.";
                 CurrentState = SearcherState.UNABLE_TO_JOIN;
-                QueryButtonText.text = "Unable to Join";
+                QueryButtonText.text = "Unable to join";
             }
 
             RoomStatusText.text = newStatusText;
         }
     }
 
-    public void JoinRoom()
+    protected void JoinRoom()
     {
-        roomManager.Self.JoinRoom(RoomName);
+        roomManager.Self.JoinRoom(_roomName);
     }
 
-    public void CreateRoom()
+    protected void CreateRoom()
     {
-        roomManager.Self.CreateRoom(RoomName);
+        roomManager.Self.CreateRoom(_roomName);
     }
 }

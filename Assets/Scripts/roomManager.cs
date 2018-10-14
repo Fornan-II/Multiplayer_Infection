@@ -57,7 +57,7 @@ public class roomManager : MonoBehaviourPunCallbacks {
     private void Awake()
     {
         //Making this class a singleton
-        /*if(Self)
+        if(Self)
         {
             Destroy(gameObject);
         }
@@ -65,7 +65,7 @@ public class roomManager : MonoBehaviourPunCallbacks {
         {
             Self = this;
             DontDestroyOnLoad(gameObject);
-        }*/
+        }
     }
 
     private void Start()
@@ -82,7 +82,7 @@ public class roomManager : MonoBehaviourPunCallbacks {
 
     public override void OnJoinedLobby()
     {
-        PhotonNetwork.JoinOrCreateRoom(roomName, null, PhotonNetwork.CurrentLobby);
+        //PhotonNetwork.JoinOrCreateRoom(roomName, null, PhotonNetwork.CurrentLobby);
     }
 
     public override void OnJoinedRoom()
@@ -99,18 +99,27 @@ public class roomManager : MonoBehaviourPunCallbacks {
     {
         Debug.Log("Room left");
         isConnected = false;
-
-        //PhotonNetwork.JoinOrCreateRoom(roomName, null, null);
     }
 
     public void JoinRoom(string roomName)
     {
         PhotonNetwork.JoinRoom(roomName);
+        //Load level that room tells us to load
     }
 
     public void CreateRoom(string roomName)
     {
         PhotonNetwork.CreateRoom(roomName, null, PhotonNetwork.CurrentLobby, null);
+    }
+
+    public override void OnCreatedRoom()
+    {
+        int levelBuildIndex = 0;
+        ExitGames.Client.Photon.Hashtable newProperties = new ExitGames.Client.Photon.Hashtable
+                        {
+                            { "int_levelBuildIndex", levelBuildIndex }
+                        };
+        _roomProperties = newProperties;
     }
 
     public void LeaveRoom()
