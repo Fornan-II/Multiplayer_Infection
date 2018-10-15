@@ -5,6 +5,7 @@ using Photon.Pun;
 
 public class PlayerController : MonoBehaviour {
 
+    public NetworkedPlayerSpawner mySpawner;
     public PlayerHUD playerHUD;
     public Reticule playerReticule;
     public Pawn ControlledPawn { get { return _controlledPawn; } }
@@ -78,5 +79,13 @@ public class PlayerController : MonoBehaviour {
         _controlledPawn.Sprint(Input.GetButton("Fire5"));
         _controlledPawn.Crouch(Input.GetButton("Fire6"));
         _controlledPawn.Cancel(Input.GetButton("Cancel"));
+    }
+
+    public void SpawnNewPawn()
+    {
+        if (mySpawner)
+        {
+            mySpawner.SpawnPlayer();
+        }
     }
 }

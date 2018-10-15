@@ -5,9 +5,9 @@ using Photon.Pun;
 
 public class DamageReciever : MonoBehaviour {
 
+    public PlayerController myController;
     public int health = 100;
     public TeamBehavior myTeam;
-    public roomManager myManager;
     protected bool _isDying = false;
 
     public int maxHealth { get { return _maxHealth; } }
@@ -43,10 +43,10 @@ public class DamageReciever : MonoBehaviour {
             _isDying = true;
             myTeam.OnDie();
             PhotonNetwork.Destroy(gameObject);
-            if (myManager)
+            if (myController)
             {
-                myManager.playerController.TakeControlOf(null);
-                myManager.SpawnPlayer();
+                myController.TakeControlOf(null);
+                myController.SpawnNewPawn();
             }
         }
     }

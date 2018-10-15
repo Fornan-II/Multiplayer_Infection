@@ -4,8 +4,7 @@ using UnityEngine;
 
 public abstract class TeamBehavior : MonoBehaviour {
 
-    public roomManager myManager;
-
+    public NetworkedPlayerSpawner playerSpawner;
     public bool AllowsFriendlyFire = true;
 
     public virtual void OnKill()

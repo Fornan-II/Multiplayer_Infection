@@ -6,10 +6,8 @@ using Photon.Realtime;
 
 public class GameManager : MonoBehaviour {
 
-    public roomManager myRoom;
-
-    [SerializeField]
     protected bool _IsMasterClient;
+    public PlayerController myPlayerController;
 
     public int PlayerCountMinimum = 2;
 
@@ -18,6 +16,7 @@ public class GameManager : MonoBehaviour {
     public float TimeBeforeZombieSpawn = 30.0f;
     public float MaxGameTime = -1.0f;
     public float AutoGameStartTime = 60.0f;
+    public float PostGameExtraTime = 10.0f;
     protected float _preGameRemainingTime;
 
     protected float _gameTimeElapsed = 0.0f;
@@ -37,14 +36,13 @@ public class GameManager : MonoBehaviour {
 
     protected virtual void Start()
     {
-        if(!myRoom)
+        if(!roomManager.Self)
         {
-            myRoom = FindObjectOfType<roomManager>();
-
-            if(!myRoom)
-            {
-                Debug.LogError("No roomManager in scene!");
-            }
+            Debug.LogError("No roomManager found!");
+        }
+        if(!myPlayerController)
+        {
+            Debug.LogError("Player Controller not linked to Game Manager!");
         }
 
         //Players ready initialization
@@ -59,9 +57,9 @@ public class GameManager : MonoBehaviour {
 
     protected virtual void Update()
     {
-        if(!myRoom.isConnected) { return; }
+        if(!roomManager.Self.isConnected) { return; }
 
-        Debug.Log("Current Game State: " + _currentGameState);
+        //Debug.Log("Current Game State: " + _currentGameState);
 
         //Check to see if this client is the Master Client
         if (PhotonNetwork.IsMasterClient != _IsMasterClient)
@@ -83,21 +81,38 @@ public class GameManager : MonoBehaviour {
         //Just to make sure
         if(!PhotonNetwork.IsMasterClient) { return; }
 
-        //If game hasn't started yet, tell the server to get ready to start the game
-        if ((PhotonNetwork.CurrentRoom.PlayerCount >= PlayerCountMinimum) && _currentGameState == GameState.PREGAME)
+        if(!roomManager.Self.RoomProperties.ContainsKey("enum_CurrentGameState"))
         {
-            //Room properties
             ExitGames.Client.Photon.Hashtable newProperties = new ExitGames.Client.Photon.Hashtable
                 {
                     { "enum_CurrentGameState", _currentGameState }
                 };
+            roomManager.Self.RoomProperties = newProperties;
+        }
 
-            if (!myRoom.RoomProperties.ContainsKey("double_PreGameCountDownStart"))
+        if(_currentGameState == GameState.PREGAME)
+        {
+            //If game hasn't started yet, tell the server to get ready to start the game
+            if ((PhotonNetwork.CurrentRoom.PlayerCount >= PlayerCountMinimum))
             {
-                newProperties.Add("double_PreGameCountDownStart", PhotonNetwork.Time);
+                //Room properties
+                if (!roomManager.Self.RoomProperties.ContainsKey("double_PreGameCountDownStart"))
+                {
+                    ExitGames.Client.Photon.Hashtable newProperties = new ExitGames.Client.Photon.Hashtable
+                        {
+                            { "double_PreGameCountDownStart", PhotonNetwork.Time }
+                        };
+                    roomManager.Self.RoomProperties = newProperties;
+                }
             }
-
-            myRoom.RoomProperties = newProperties;
+            else if(roomManager.Self.RoomProperties.ContainsKey("double_PreGameCountDownStart"))
+            {
+                ExitGames.Client.Photon.Hashtable newProperties = new ExitGames.Client.Photon.Hashtable
+                    {
+                        { "double_PreGameCountDownStart", null }
+                    };
+                roomManager.Self.RoomProperties = newProperties;
+            }
         }
 
         if(_currentGameState == GameState.PREPARATION_PHASE)
@@ -136,7 +151,7 @@ public class GameManager : MonoBehaviour {
     {
         //Update Game state
         object gameStateObj;
-        if (myRoom.RoomProperties.TryGetValue("enum_CurrentGameState", out gameStateObj))
+        if (roomManager.Self.RoomProperties.TryGetValue("enum_CurrentGameState", out gameStateObj))
         {
             if ((GameState)gameStateObj != _currentGameState)
             {
@@ -148,7 +163,7 @@ public class GameManager : MonoBehaviour {
         {
             //Get ready to start game if Server says so.
             object preGameStartTime;
-            if (myRoom.RoomProperties.TryGetValue("double_PreGameCountDownStart", out preGameStartTime))
+            if (roomManager.Self.RoomProperties.TryGetValue("double_PreGameCountDownStart", out preGameStartTime))
             {
                 //Run auto-start timer
                 float preGameElapsedTime = (float)(PhotonNetwork.Time - (double)preGameStartTime);
@@ -184,10 +199,10 @@ public class GameManager : MonoBehaviour {
             }
         }
 
-        if(_currentGameState == GameState.PREPARATION_PHASE || _currentGameState == GameState.GAME_RUNNING)
+        if(_currentGameState == GameState.PREPARATION_PHASE || _currentGameState == GameState.GAME_RUNNING || _currentGameState == GameState.GAME_END)
         {
             object startTimeObj;
-            if (myRoom.RoomProperties.TryGetValue("double_StartTime", out startTimeObj))
+            if (roomManager.Self.RoomProperties.TryGetValue("double_StartTime", out startTimeObj))
             {
                 _gameTimeElapsed = (float)(PhotonNetwork.Time - (double)startTimeObj);
             }
@@ -195,24 +210,34 @@ public class GameManager : MonoBehaviour {
 
         if (_currentGameState == GameState.GAME_RUNNING)
         {
-            if(myRoom.myPlayerType == roomManager.PlayerType.HUMAN)
+            if(myPlayerController.mySpawner.myPlayerType == NetworkedPlayerSpawner.PlayerType.HUMAN)
             {
                 object IsHuman;
                 if(PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("bool_IsHuman", out IsHuman))
                 {
                     if(!(bool)IsHuman)
                     {
-                        myRoom.playerController.MurderPawn();
+                        myPlayerController.MurderPawn();
                     }
                 }
+            }
+            if(!myPlayerController.mySpawner.playerTypesAllowedToSpawn[NetworkedPlayerSpawner.PlayerType.ZOMBIE])
+            {
+                myPlayerController.mySpawner.playerTypesAllowedToSpawn[NetworkedPlayerSpawner.PlayerType.ZOMBIE] = true;
             }
         }
 
         if(_currentGameState == GameState.GAME_END)
         {
-            if(myRoom.isConnected)
+            object leaveRoomTimeObj;
+            if(roomManager.Self.RoomProperties.TryGetValue("float_ReturnToLobbyTime", out leaveRoomTimeObj) && roomManager.Self.isConnected)
             {
-                myRoom.LeaveRoom();
+                Debug.Log("rtlt found... value: " + (float)leaveRoomTimeObj);
+                if(_gameTimeElapsed > (float)leaveRoomTimeObj)
+                {
+                    myPlayerController.TakeControlOf(null);
+                    roomManager.Self.LeaveRoom();
+                }
             }
         }
     }
@@ -237,17 +262,19 @@ public class GameManager : MonoBehaviour {
                 { "double_PreGameCountDownStart", null }
             };
 
-            if(!myRoom.RoomProperties.ContainsKey("double_StartTime"))
+            if(!roomManager.Self.RoomProperties.ContainsKey("double_StartTime"))
             {
                 newProperties.Add("double_StartTime", PhotonNetwork.Time);
             }
 
-            myRoom.RoomProperties = newProperties;
+            roomManager.Self.RoomProperties = newProperties;
         }
 
+        myPlayerController.mySpawner.playerTypesAllowedToSpawn[NetworkedPlayerSpawner.PlayerType.HUMAN] = true;
         _playerInitialized = true;
         _currentGameState = GameState.PREPARATION_PHASE;
-        myRoom.myPlayerType = roomManager.PlayerType.HUMAN;
+        myPlayerController.mySpawner.myPlayerType = NetworkedPlayerSpawner.PlayerType.HUMAN;
+        myPlayerController.SpawnNewPawn();
     }
 
     protected virtual void EndGame()
@@ -255,11 +282,13 @@ public class GameManager : MonoBehaviour {
         if (_IsMasterClient)
         {
             ExitGames.Client.Photon.Hashtable newProperties = new ExitGames.Client.Photon.Hashtable
-            {
-                { "enum_CurrentGameState", GameState.GAME_END }
-            };
-            myRoom.RoomProperties = newProperties;
-            myRoom.RoomCanBeJoined = false;
+                {
+                    { "enum_CurrentGameState", GameState.GAME_END },
+                    { "float_ReturnToLobbyTime", _gameTimeElapsed + PostGameExtraTime }
+                };
+
+            roomManager.Self.RoomProperties = newProperties;
+            roomManager.Self.RoomCanBeJoined = false;
         }
     }
 
@@ -310,9 +339,9 @@ public class GameManager : MonoBehaviour {
 
         newProperties.Clear();
         newProperties.Add("enum_CurrentGameState", GameState.GAME_RUNNING);
-        myRoom.RoomProperties = newProperties;
+        roomManager.Self.RoomProperties = newProperties;
         //Make the room no longer joinable
-        myRoom.RoomCanBeJoined = false;
+        roomManager.Self.RoomCanBeJoined = false;
     }
 
     protected virtual void OnGUI()
@@ -332,9 +361,8 @@ public class GameManager : MonoBehaviour {
                 }
             }
 
-            if(myRoom.isConnected)
+            if(roomManager.Self.isConnected)
             {
-                //Debug.Log(_preGameRemainingTime);
                 if (_preGameRemainingTime < AutoGameStartTime)
                 {
                     GUI.Box(new Rect(Screen.width - 130, 10, 120, 43), "Game will start\nin " + (int)_preGameRemainingTime + " seconds.");
@@ -347,8 +375,7 @@ public class GameManager : MonoBehaviour {
                 GUI.Box(new Rect(10, 10, 100, 25), "0 of " + PlayerCountMinimum + " players");
             }
         }
-
-        if(_currentGameState == GameState.PREPARATION_PHASE || _currentGameState == GameState.GAME_RUNNING)
+        else if(_currentGameState == GameState.PREPARATION_PHASE || _currentGameState == GameState.GAME_RUNNING)
         {
             int minutes = (int)_gameTimeElapsed / 60;
             int seconds = (int)_gameTimeElapsed % 60;
@@ -363,6 +390,22 @@ public class GameManager : MonoBehaviour {
             }
 
             GUI.Box(new Rect(Screen.width - 110, 10, 100, 25), message);
+        }
+        else if(CurrentGameState == GameState.GAME_END)
+        {
+            int minutes = (int)_gameTimeElapsed / 60;
+            int seconds = (int)_gameTimeElapsed % 60;
+            string message = minutes + ":";
+            if (seconds < 10)
+            {
+                message += "0" + seconds;
+            }
+            else
+            {
+                message += seconds;
+            }
+
+            GUI.Box(new Rect(Screen.width - 130, 10, 120, 43), message + "\nGame Over!");
         }
     }
 }

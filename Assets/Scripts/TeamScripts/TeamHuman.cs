@@ -7,9 +7,9 @@ public class TeamHuman : TeamBehavior {
     public override void OnDie()
     {
         base.OnDie();
-        if(myManager)
+        if(playerSpawner)
         {
-            myManager.myPlayerType = roomManager.PlayerType.ZOMBIE;
+            playerSpawner.myPlayerType = NetworkedPlayerSpawner.PlayerType.ZOMBIE;
         }
     }
 }

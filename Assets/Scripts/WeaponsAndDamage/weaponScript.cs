@@ -81,7 +81,6 @@ public class weaponScript : MonoBehaviour {
             {
                 //RPCs are basically calling a method over the network,
                 _hitPhotonView.RPC("ApplyDamage", RpcTarget.All, damage);
-                Debug.Log("Hit!");
             }
         }
     }

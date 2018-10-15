@@ -11,12 +11,13 @@ public class RoomSearcher : MonoBehaviour {
     public Text RoomStatusText;
     public Text RoomNameField;
 
+    public int gameSceneBuildIndex = 1;
+
     public enum SearcherState
     {
         QUERY,
         JOIN,
-        CREATE,
-        UNABLE_TO_JOIN
+        CREATE
     }
     public SearcherState CurrentState = SearcherState.QUERY;
 
@@ -36,27 +37,47 @@ public class RoomSearcher : MonoBehaviour {
         {
             Debug.LogWarning(name + " does not have RoomNameField assigned!");
         }
+
+        RoomStatusText.text = "";
     }
 
     public void RoomNameTextOnChange()
     {
         CurrentState = SearcherState.QUERY;
         QueryButtonText.text = "Search for room...";
-        _roomName = RoomNameField.text;
+    }
+
+    public void OnRoomNameFinishedEditing()
+    {
+        _roomName = RoomNameField.text.Trim();
     }
 
     public void QueryButtonAction()
     {
+        //First remove leading/trailing white space, then make sure roomName isn't an empty field.
+        if(_roomName == "")
+        {
+            RoomNameTextOnChange();
+            RoomStatusText.text = "Invalid room name; can not be empty.";
+            return;
+        }
+
+        //Then, perform button action
+        SearcherState StartingState = CurrentState;
+
         QueryRoom();
 
-        if(CurrentState == SearcherState.JOIN) { JoinRoom(); }
+        //If state changed during the query, don't try to do anything else yet.
+        if (StartingState != CurrentState) { return; }
+
+        if (CurrentState == SearcherState.JOIN) { JoinRoom(); }
         else if(CurrentState == SearcherState.CREATE) { CreateRoom(); }
     }
 
     protected void QueryRoom()
     {
         RoomInfo foundRoom = null;
-        for(int i = 0; (i < roomManager.Self.roomName.Length) && (foundRoom == null); i++)
+        for(int i = 0; (i < roomManager.Self.RoomList.Count) && (foundRoom == null); i++)
         {
             if(roomManager.Self.RoomList[i].Name == _roomName)
             {
@@ -67,7 +88,7 @@ public class RoomSearcher : MonoBehaviour {
         if(foundRoom == null)
         {
             CurrentState = SearcherState.CREATE;
-            RoomStatusText.text = "No room of this name found.";
+            RoomStatusText.text = "No room called " + _roomName + " found.";
             QueryButtonText.text = "Create room";
         }
         else
@@ -99,7 +120,7 @@ public class RoomSearcher : MonoBehaviour {
             else
             {
                 newStatusText += "Game already in progress, can not join.";
-                CurrentState = SearcherState.UNABLE_TO_JOIN;
+                CurrentState = SearcherState.QUERY;
                 QueryButtonText.text = "Unable to join";
             }
 
@@ -114,6 +135,6 @@ public class RoomSearcher : MonoBehaviour {
 
     protected void CreateRoom()
     {
-        roomManager.Self.CreateRoom(_roomName);
+        roomManager.Self.CreateRoom(_roomName, gameSceneBuildIndex);
     }
 }

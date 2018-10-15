@@ -48,6 +48,11 @@ public class Pawn : MonoBehaviour {
         {
             myWeaponHolder.LinkWeaponReticule(_controller.playerReticule);
         }
+
+        if(myDamageReciever)
+        {
+            myDamageReciever.myController = c;
+        }
     }
 
     public virtual void OnReleasedControl()
