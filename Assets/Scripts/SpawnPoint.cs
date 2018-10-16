@@ -110,9 +110,9 @@ public class SpawnPoint : MonoBehaviour {
 
         SpawnPoint chosenSpawn;
 
-        if(!UsePreferredSpawns)
+        int maxIndex = PreferredSpawns.Count + ValidSpawns.Count;
+        if (!UsePreferredSpawns && maxIndex > 0)
         {
-            int maxIndex = PreferredSpawns.Count + ValidSpawns.Count;
             int selectedIndex = Random.Range(0, maxIndex);
 
             if (selectedIndex < PreferredSpawns.Count)
@@ -134,7 +134,7 @@ public class SpawnPoint : MonoBehaviour {
         }
         else if(AllSpawnPoints.Count > 0)
         {
-            chosenSpawn = ValidSpawns[Random.Range(0, ValidSpawns.Count)];
+            chosenSpawn = AllSpawnPoints[Random.Range(0, AllSpawnPoints.Count)];
         }
         else
         {

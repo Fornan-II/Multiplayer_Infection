@@ -124,23 +124,25 @@ public class GameManager : MonoBehaviour {
             }
         }
 
-        if(_currentGameState == GameState.PREPARATION_PHASE || _currentGameState == GameState.GAME_RUNNING)
+        if(_currentGameState == GameState.GAME_RUNNING)
         {
-            bool humansRemain = false;
             bool isHumanInitialized = false;
-            for (int i = 0; (i < PhotonNetwork.PlayerList.Length) && !humansRemain; i++)
+            bool bothTeamsExist = false;
+            bool previousWasHuman = false;
+            for (int i = 0; (i < PhotonNetwork.PlayerList.Length) && !bothTeamsExist; i++)
             {
                 object isHuman;
                 if (PhotonNetwork.PlayerList[i].CustomProperties.TryGetValue("bool_IsHuman", out isHuman))
                 {
                     isHumanInitialized = true;
-                    if ((bool)isHuman)
+                    if (i > 0)
                     {
-                        humansRemain = true;
+                        bothTeamsExist = previousWasHuman != (bool)isHuman;
                     }
+                    previousWasHuman = (bool)isHuman; 
                 }
             }
-            if (isHumanInitialized && !humansRemain)
+            if (isHumanInitialized && !bothTeamsExist)
             {
                 EndGame();
             }
@@ -232,7 +234,6 @@ public class GameManager : MonoBehaviour {
             object leaveRoomTimeObj;
             if(roomManager.Self.RoomProperties.TryGetValue("float_ReturnToLobbyTime", out leaveRoomTimeObj) && roomManager.Self.isConnected)
             {
-                Debug.Log("rtlt found... value: " + (float)leaveRoomTimeObj);
                 if(_gameTimeElapsed > (float)leaveRoomTimeObj)
                 {
                     myPlayerController.TakeControlOf(null);
@@ -268,6 +269,8 @@ public class GameManager : MonoBehaviour {
             }
 
             roomManager.Self.RoomProperties = newProperties;
+            //Make the room no longer joinable
+            roomManager.Self.RoomCanBeJoined = false;
         }
 
         myPlayerController.mySpawner.playerTypesAllowedToSpawn[NetworkedPlayerSpawner.PlayerType.HUMAN] = true;
@@ -289,6 +292,7 @@ public class GameManager : MonoBehaviour {
 
             roomManager.Self.RoomProperties = newProperties;
             roomManager.Self.RoomCanBeJoined = false;
+            roomManager.Self.RoomIsVisible = false;
         }
     }
 
@@ -340,8 +344,6 @@ public class GameManager : MonoBehaviour {
         newProperties.Clear();
         newProperties.Add("enum_CurrentGameState", GameState.GAME_RUNNING);
         roomManager.Self.RoomProperties = newProperties;
-        //Make the room no longer joinable
-        roomManager.Self.RoomCanBeJoined = false;
     }
 
     protected virtual void OnGUI()
@@ -363,7 +365,7 @@ public class GameManager : MonoBehaviour {
 
             if(roomManager.Self.isConnected)
             {
-                if (_preGameRemainingTime < AutoGameStartTime)
+                if (_preGameRemainingTime < AutoGameStartTime && PhotonNetwork.CurrentRoom.PlayerCount >= PlayerCountMinimum)
                 {
                     GUI.Box(new Rect(Screen.width - 130, 10, 120, 43), "Game will start\nin " + (int)_preGameRemainingTime + " seconds.");
                 }

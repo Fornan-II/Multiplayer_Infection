@@ -75,7 +75,7 @@ public class weaponScript : MonoBehaviour {
 
         if(_validHit)
         {
-            /*GameObject par = */PhotonNetwork.Instantiate(hitParticle.name, _hit.point, _hit.transform.rotation);
+            PhotonNetwork.Instantiate(hitParticle.name, _hit.point, _hit.transform.rotation);
             
             if (_hitPhotonView)
             {

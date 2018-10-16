@@ -15,10 +15,7 @@ public class PlayerController : MonoBehaviour {
     {
         if (pawn == null)
         {
-            if (_controlledPawn)
-            {
-                ReleaseControl();
-            }
+            ReleaseControl();
             return true;
         }
         if(_controlledPawn)
@@ -83,7 +80,7 @@ public class PlayerController : MonoBehaviour {
 
     public void SpawnNewPawn()
     {
-        if (mySpawner)
+        if (mySpawner && !ControlledPawn)
         {
             mySpawner.SpawnPlayer();
         }

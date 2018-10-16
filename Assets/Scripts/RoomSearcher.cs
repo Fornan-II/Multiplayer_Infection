@@ -76,6 +76,8 @@ public class RoomSearcher : MonoBehaviour {
 
     protected void QueryRoom()
     {
+        roomManager.Self.ForceRefreshRoomList();
+
         RoomInfo foundRoom = null;
         for(int i = 0; (i < roomManager.Self.RoomList.Count) && (foundRoom == null); i++)
         {
@@ -100,22 +102,23 @@ public class RoomSearcher : MonoBehaviour {
                 object gameStatusObj;
                 if(foundRoom.CustomProperties.TryGetValue("enum_CurrentGameState", out gameStatusObj))
                 {
-                    GameManager.GameState gameStatus = (GameManager.GameState)gameStatusObj;
-                    if(gameStatus == GameManager.GameState.PREPARATION_PHASE)
+                    if((GameManager.GameState)gameStatusObj == GameManager.GameState.PREGAME)
                     {
-                        newStatusText += "Currently in preperation phase: zombies spawning soon.";
+                        newStatusText += "Currently waiting for the game to start.";
+                        QueryButtonText.text = "Join game";
                     }
                     else
                     {
-                        newStatusText += "Currently waiting for the game to start.";
+                        newStatusText += "Game already in progress, can not join.";
+                        CurrentState = SearcherState.QUERY;
+                        QueryButtonText.text = "Unable to join";
                     }
                 }
                 else
                 {
                     newStatusText += "Currently waiting for the game to start.";
+                    QueryButtonText.text = "Join game";
                 }
-
-                QueryButtonText.text = "Join game";
             }
             else
             {

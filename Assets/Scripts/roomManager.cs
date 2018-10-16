@@ -40,6 +40,18 @@ public class roomManager : MonoBehaviourPunCallbacks {
         }
     }
 
+    public bool RoomIsVisible
+    {
+        get
+        {
+            return PhotonNetwork.CurrentRoom.IsVisible;
+        }
+        set
+        {
+            PhotonNetwork.CurrentRoom.IsVisible = value;
+        }
+    }
+
     protected List<RoomInfo> _roomList;
     public List<RoomInfo> RoomList { get { return _roomList; } }
 
@@ -96,6 +108,9 @@ public class roomManager : MonoBehaviourPunCallbacks {
         Debug.Log("Room left");
         _roomProperties = null;
         isConnected = false;
+        TypedLobby lobby = PhotonNetwork.CurrentLobby;
+        PhotonNetwork.LeaveLobby();
+        PhotonNetwork.JoinLobby(lobby);
     }
 
     public void JoinRoom(string roomName)
@@ -129,7 +144,13 @@ public class roomManager : MonoBehaviourPunCallbacks {
 
         Debug.Log("Leaving room...");
         PhotonNetwork.LeaveRoom();
+        SpawnPoint.ClearSpawnPointList();
         SceneManager.LoadScene("LobbyScene");
+    }
+
+    public void ForceRefreshRoomList()
+    {
+        PhotonNetwork.GetCustomRoomList(PhotonNetwork.CurrentLobby, null);
     }
 
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
