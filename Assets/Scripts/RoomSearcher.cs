@@ -23,6 +23,8 @@ public class RoomSearcher : MonoBehaviour {
 
     protected string _roomName = "";
 
+    protected bool hasPressedJoinOrCreate = false;
+
     private void Start()
     {
         if(!QueryButtonText)
@@ -133,11 +135,15 @@ public class RoomSearcher : MonoBehaviour {
 
     protected void JoinRoom()
     {
+        if(hasPressedJoinOrCreate) { return; }
+
+        hasPressedJoinOrCreate = true;
         roomManager.Self.JoinRoom(_roomName);
     }
 
     protected void CreateRoom()
     {
+        hasPressedJoinOrCreate = true;
         roomManager.Self.CreateRoom(_roomName, gameSceneBuildIndex);
     }
 }

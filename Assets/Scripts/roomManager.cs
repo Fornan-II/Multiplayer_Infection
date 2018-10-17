@@ -85,7 +85,6 @@ public class roomManager : MonoBehaviourPunCallbacks {
 
     public override void OnJoinedLobby()
     {
-        
     }
 
     public override void OnJoinedRoom()
@@ -100,7 +99,8 @@ public class roomManager : MonoBehaviourPunCallbacks {
         {
             gameSceneBuildIndex = (int)sceneIndex;
         }
-        SceneManager.LoadScene(gameSceneBuildIndex);
+        PhotonNetwork.LoadLevel(gameSceneBuildIndex);
+        //SceneManager.LoadScene(gameSceneBuildIndex);
     }
 
     public override void OnLeftRoom()
@@ -116,7 +116,6 @@ public class roomManager : MonoBehaviourPunCallbacks {
     public void JoinRoom(string roomName)
     {
         PhotonNetwork.JoinRoom(roomName);
-        //Load level that room tells us to load
     }
 
     public void CreateRoom(string roomName, int levelBuildIndex)
@@ -145,7 +144,8 @@ public class roomManager : MonoBehaviourPunCallbacks {
         Debug.Log("Leaving room...");
         PhotonNetwork.LeaveRoom();
         SpawnPoint.ClearSpawnPointList();
-        SceneManager.LoadScene("LobbyScene");
+        PhotonNetwork.LoadLevel("LobbyScene");
+        //SceneManager.LoadScene("LobbyScene");
     }
 
     public void ForceRefreshRoomList()
