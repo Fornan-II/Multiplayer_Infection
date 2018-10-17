@@ -9,7 +9,7 @@ public class SpawnPoint : MonoBehaviour {
     protected static List<SpawnPoint> ValidSpawns = new List<SpawnPoint>();
     protected static List<SpawnPoint> PreferredSpawns = new List<SpawnPoint>();
 
-    protected static float HostileCheckRadius = 30.0f;
+    protected static float HostileCheckRadius = 15.0f;
 
     public enum SpawnPointState
     {

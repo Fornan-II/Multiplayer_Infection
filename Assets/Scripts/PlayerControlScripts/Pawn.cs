@@ -8,6 +8,7 @@ public class Pawn : MonoBehaviour {
     public lookScript myLookScript;
     public WeaponHolder myWeaponHolder;
     public DamageReciever myDamageReciever;
+    public GameObject thingInMyFace;
 
     protected PlayerController _controller;
 
@@ -52,6 +53,11 @@ public class Pawn : MonoBehaviour {
         if(myDamageReciever)
         {
             myDamageReciever.myController = c;
+        }
+
+        if(thingInMyFace)
+        {
+            thingInMyFace.SetActive(false);
         }
     }
 

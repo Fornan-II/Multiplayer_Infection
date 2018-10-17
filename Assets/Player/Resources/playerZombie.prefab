@@ -197,7 +197,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.01
   far clip plane: 1000
   field of view: 70
   orthographic: 0
@@ -394,7 +394,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 948f4100a11a5c24981795d21301da5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  volumeTrigger: {fileID: 0}
+  volumeTrigger: {fileID: 4505195878942832, guid: 9792b6a0997fa854eb53edeedf9e0fe5,
+    type: 2}
   volumeLayer:
     serializedVersion: 2
     m_Bits: 512
@@ -484,6 +485,7 @@ MonoBehaviour:
   myLookScript: {fileID: 114503641715294250}
   myWeaponHolder: {fileID: 114719022726884804}
   myDamageReciever: {fileID: 114603721776678552}
+  thingInMyFace: {fileID: 1050690788766526}
 --- !u!114 &114463376470053964
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -499,14 +501,14 @@ MonoBehaviour:
   allowSprinting: 1
   allowJumping: 1
   allowCrouching: 1
-  moveSpeed: 7
+  moveSpeed: 5.5
   groundedInertia: 0.7
   aerialInertia: 0.95
-  sprintMultiplier: 1.8
+  sprintMultiplier: 1.6
   crouchMultiplier: 0.5
   crouchRate: 5
   jumpForce: 10
-  maxGroundAngle: 40
+  maxGroundAngle: 50
   coyoteTimeDuration: 0.1
   gravity: 20
   letBeGrounded: 1

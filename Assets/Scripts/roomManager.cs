@@ -11,7 +11,7 @@ public class roomManager : MonoBehaviourPunCallbacks {
 
     public static roomManager Self;
 
-    public string roomName = "defaultRoom";
+    protected string _roomName = "";
 
     public int gameSceneBuildIndex = 0;
 
@@ -85,6 +85,10 @@ public class roomManager : MonoBehaviourPunCallbacks {
 
     public override void OnJoinedLobby()
     {
+        if(_roomName != "")
+        {
+            JoinRoom(_roomName);
+        }
     }
 
     public override void OnJoinedRoom()
@@ -106,6 +110,7 @@ public class roomManager : MonoBehaviourPunCallbacks {
     public override void OnLeftRoom()
     {
         Debug.Log("Room left");
+
         _roomProperties = null;
         isConnected = false;
         TypedLobby lobby = PhotonNetwork.CurrentLobby;
@@ -113,15 +118,17 @@ public class roomManager : MonoBehaviourPunCallbacks {
         PhotonNetwork.JoinLobby(lobby);
     }
 
-    public void JoinRoom(string roomName)
+    public void JoinRoom(string room)
     {
-        PhotonNetwork.JoinRoom(roomName);
+        _roomName = room;
+        PhotonNetwork.JoinRoom(_roomName);
     }
 
-    public void CreateRoom(string roomName, int levelBuildIndex)
+    public void CreateRoom(string room, int levelBuildIndex)
     {
         gameSceneBuildIndex = levelBuildIndex;
-        PhotonNetwork.CreateRoom(roomName, null, PhotonNetwork.CurrentLobby, null);
+        _roomName = room;
+        PhotonNetwork.CreateRoom(_roomName, null, PhotonNetwork.CurrentLobby, null);
     }
 
     public override void OnCreatedRoom()
@@ -140,7 +147,7 @@ public class roomManager : MonoBehaviourPunCallbacks {
             Debug.LogWarning("Can not leave room when there is no room connected to.");
             return;
         }
-
+        
         Debug.Log("Leaving room...");
         PhotonNetwork.LeaveRoom();
         SpawnPoint.ClearSpawnPointList();

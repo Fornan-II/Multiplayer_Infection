@@ -685,7 +685,7 @@ MonoBehaviour:
   QueryButtonText: {fileID: 877674056}
   RoomStatusText: {fileID: 1432344335}
   RoomNameField: {fileID: 782241256}
-  gameSceneBuildIndex: 2
+  gameSceneBuildIndex: 1
   CurrentState: 0
 --- !u!114 &990290047
 MonoBehaviour:
@@ -1317,7 +1317,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DebugLogRoomProperties: 0
-  roomName: defaultRoom
   gameSceneBuildIndex: 0
   isConnected: 0
 --- !u!4 &1474304267

@@ -197,7 +197,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.01
   far clip plane: 1000
   field of view: 70
   orthographic: 0
@@ -486,14 +486,14 @@ MonoBehaviour:
   allowSprinting: 1
   allowJumping: 1
   allowCrouching: 1
-  moveSpeed: 5
+  moveSpeed: 4
   groundedInertia: 0.7
   aerialInertia: 0.95
-  sprintMultiplier: 2
+  sprintMultiplier: 1.7
   crouchMultiplier: 0.5
   crouchRate: 5
   jumpForce: 7
-  maxGroundAngle: 40
+  maxGroundAngle: 50
   coyoteTimeDuration: 0.1
   gravity: 20
   letBeGrounded: 1
@@ -537,6 +537,7 @@ MonoBehaviour:
   myLookScript: {fileID: 114503641715294250}
   myWeaponHolder: {fileID: 114654720767678556}
   myDamageReciever: {fileID: 114603721776678552}
+  thingInMyFace: {fileID: 1050690788766526}
 --- !u!114 &114603721776678552
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -617,7 +618,7 @@ MonoBehaviour:
   ownersTeam: {fileID: 114167211767056408}
   hitParticle: {fileID: 1800437452848824, guid: e43a8bd1cba21a54dbdb946b05efc854,
     type: 2}
-  damage: 30
+  damage: 40
   range: 100
   rb: {fileID: 0}
   col: {fileID: 0}
