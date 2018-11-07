@@ -242,6 +242,12 @@ public class advancedMoveScript : MonoBehaviour
     #region Helper Functions
     //Useful function simplifying toggling cursor locking
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawSphere(_col.transform.position, _col.radius);
+        Debug.Log("Aasd");
+    }
+
     protected virtual void CheckIfGrounded()
     {
         //Prepare data for use in CheckSphere()
